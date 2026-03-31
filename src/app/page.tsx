@@ -4,6 +4,7 @@ import HomePage from '@/components/HomePage';
 import creatorsData from '@/data/creators.json';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export default async function Page() {
   const { apps, collections, seedCollections } = await getAllData();

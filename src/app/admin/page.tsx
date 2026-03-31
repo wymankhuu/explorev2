@@ -3,6 +3,7 @@ import { getAllData } from '@/lib/notion';
 import AdminDashboard from '@/components/AdminDashboard';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export const metadata = {
   title: 'Admin Dashboard — Playlab Explore',
