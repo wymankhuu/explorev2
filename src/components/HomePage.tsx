@@ -58,6 +58,9 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const { isAdmin, password: adminPassword } = useAdmin();
   const [adminMode, setAdminMode] = useState(false);
+  useEffect(() => {
+    setAdminMode(isAdmin);
+  }, [isAdmin]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const handleSelectToggle = useCallback((id: string) => {
