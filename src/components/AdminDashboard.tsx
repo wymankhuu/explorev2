@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Shield, Database, CheckCircle2, AlertTriangle, Star, Lock, Unlock, Download, Sparkles } from 'lucide-react';
+import { Shield, Database, CheckCircle2, AlertTriangle, Lock, Unlock, Download, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useAdmin } from '@/hooks/useAdmin';
 import type { App, Collection } from '@/lib/types';
@@ -233,29 +233,17 @@ interface AdminDashboardProps {
   collections: Collection[];
 }
 
-type SortKey = 'name' | 'creator' | 'completeness' | 'pinned' | 'stars';
+type SortKey = 'name' | 'creator' | 'completeness';
 type SortDir = 'asc' | 'desc';
 
 export default function AdminDashboard({ apps: initialApps, collections }: AdminDashboardProps) {
   const { isAdmin, password, login } = useAdmin();
   const [apps, setApps] = useState(initialApps);
-  const [starCounts, setStarCounts] = useState<Record<string, number>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('completeness');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [filterCollection, setFilterCollection] = useState<string>('');
   const [search, setSearch] = useState('');
-
-  // Fetch star counts
-  useEffect(() => {
-    if (!isAdmin) return;
-    const ids = apps.map((a) => a.id).slice(0, 100).join(',');
-    if (!ids) return;
-    fetch(`/api/stars?ids=${ids}`)
-      .then((r) => r.json())
-      .then((data) => setStarCounts(data))
-      .catch(() => {});
-  }, [isAdmin, apps]);
 
   if (!isAdmin) {
     return <PasswordGate onSuccess={login} />;
@@ -265,7 +253,6 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
   const totalApps = apps.length;
   const completeApps = apps.filter((a) => a.description && a.usage && a.impact).length;
   const missingApps = totalApps - completeApps;
-  const totalStars = Object.values(starCounts).reduce((sum, n) => sum + n, 0);
 
   // Filter + search
   let filtered = apps;
@@ -290,8 +277,6 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
         cmp = order[completenessLevel(a)] - order[completenessLevel(b)];
         break;
       }
-      case 'pinned': cmp = (a.pinned ? 1 : 0) - (b.pinned ? 1 : 0); break;
-      case 'stars': cmp = (starCounts[a.id] || 0) - (starCounts[b.id] || 0); break;
     }
     return sortDir === 'asc' ? cmp : -cmp;
   });
@@ -310,9 +295,9 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
 
   const exportCsv = () => {
     const escape = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const header = 'Name,Creator,Role,Collection,Description,Usage,Impact,Pinned,Stars';
+    const header = 'Name,Creator,Role,Collection,Description,Usage,Impact';
     const rows = sorted.map((a) =>
-      [a.name, a.creator, a.role, a.tags[0] || '', a.description, a.usage, a.impact, a.pinned ? 'Yes' : 'No', starCounts[a.id] || 0]
+      [a.name, a.creator, a.role, a.tags[0] || '', a.description, a.usage, a.impact]
         .map((v) => escape(String(v)))
         .join(',')
     );
@@ -364,11 +349,10 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <StatCard icon={Database} label="Total Apps" value={totalApps} color="bg-blue-500" />
           <StatCard icon={CheckCircle2} label="Complete Content" value={completeApps} color="bg-green-500" />
           <StatCard icon={AlertTriangle} label="Missing Content" value={missingApps} color="bg-amber-500" />
-          <StatCard icon={Star} label="Total Stars" value={totalStars} color="bg-purple-500" />
         </div>
 
         {/* Filters */}
@@ -411,16 +395,14 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
                 <SortHeader label="Creator" sortKeyName="creator" />
                 <th className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Collection</th>
                 <SortHeader label="Content" sortKeyName="completeness" />
-                <SortHeader label="Pinned" sortKeyName="pinned" />
-                <SortHeader label="Stars" sortKeyName="stars" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {sorted.map((app) => (
                 <tr key={app.id} className="group">
-                  <td colSpan={6} className="p-0">
+                  <td colSpan={4} className="p-0">
                     <div
-                      className={`grid grid-cols-[1fr_1fr_1fr_auto_auto_auto] items-center cursor-pointer hover:bg-slate-50 transition-colors ${rowColor(app)} ${expandedId === app.id ? 'bg-amber-50' : ''}`}
+                      className={`grid grid-cols-[1fr_1fr_1fr_auto] items-center cursor-pointer hover:bg-slate-50 transition-colors ${rowColor(app)} ${expandedId === app.id ? 'bg-amber-50' : ''}`}
                       onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}
                     >
                       <div className="px-3 py-2.5 text-sm font-medium text-slate-900 truncate max-w-[200px]">{app.name}</div>
@@ -431,8 +413,6 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
                         <HealthDot filled={!!app.usage} />
                         <HealthDot filled={!!app.impact} />
                       </div>
-                      <div className="px-3 py-2.5 text-xs text-slate-500">{app.pinned ? '\ud83d\udccc' : '\u2014'}</div>
-                      <div className="px-3 py-2.5 text-xs text-slate-500">{starCounts[app.id] || 0}</div>
                     </div>
                     {expandedId === app.id && (
                       <InlineEditor
