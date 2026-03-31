@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GlobeIcon } from 'lucide-react';
 import type { App, Collection, SeedCollection } from '@/lib/types';
-import { FILTER_OPTIONS, getContainerTheme } from '@/lib/utils';
+import { FILTER_OPTIONS, getContainerTheme, getInitials, generateCreatorSlug } from '@/lib/utils';
 import AppCard from './AppCard';
 import AppDrawer from './AppDrawer';
 import CollectionSection from './CollectionSection';
@@ -106,6 +107,32 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
     return effectiveApps
       .filter((app) => app.pinned)
       .sort((a, b) => (a.homepageOrder ?? 999) - (b.homepageOrder ?? 999));
+  }, [effectiveApps]);
+
+  // Top creators — grouped by creator name, sorted by app count
+  const topCreators = useMemo(() => {
+    const map = new Map<string, { name: string; role: string; slug: string; appCount: number; totalSessions: number }>();
+    for (const app of effectiveApps) {
+      if (!app.creator) continue;
+      const key = app.creator.toLowerCase().trim();
+      const existing = map.get(key);
+      if (existing) {
+        existing.appCount++;
+        existing.totalSessions += app.sessions || 0;
+      } else {
+        map.set(key, {
+          name: app.creator,
+          role: app.role || '',
+          slug: generateCreatorSlug(app.creator),
+          appCount: 1,
+          totalSessions: app.sessions || 0,
+        });
+      }
+    }
+    return [...map.values()]
+      .filter((c) => c.appCount >= 2)
+      .sort((a, b) => b.appCount - a.appCount)
+      .slice(0, 12);
   }, [effectiveApps]);
 
   const filteredApps = useMemo(() => {
@@ -302,6 +329,36 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                     onSelectToggle={() => handleSelectToggle(app.id)}
                   />
                 ))}
+              </div>
+            )}
+            {/* Top Creators */}
+            {!isFiltering && topCreators.length > 0 && (
+              <div className="mt-12 mb-4">
+                <h2 className="font-heading text-xl sm:text-2xl font-semibold text-zinc-800 flex items-center gap-1.5 mb-4">
+                  <span>👩‍🏫</span> Top Creators
+                </h2>
+                <div className="flex gap-3 overflow-x-auto pb-3 -mx-2 px-2 scrollbar-hide">
+                  {topCreators.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/creator/${c.slug}`}
+                      className="flex-none w-[180px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md hover:border-slate-300 transition-all group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white text-sm font-bold shrink-0 group-hover:scale-105 transition-transform">
+                          {getInitials(c.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold text-zinc-800 truncate">{c.name}</div>
+                          {c.role && <div className="text-xs text-slate-500 truncate">{c.role}</div>}
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {c.appCount} apps · {c.totalSessions > 0 ? `${c.totalSessions >= 1000 ? (c.totalSessions / 1000).toFixed(1) + 'K' : c.totalSessions} sessions` : ''}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
             {isFiltering && filteredApps.length === 0 && (

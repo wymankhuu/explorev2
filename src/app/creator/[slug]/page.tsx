@@ -23,5 +23,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const creator = creatorApps[0].creator;
   const role = creatorApps[0].role;
 
-  return <CreatorProfilePage creator={creator} role={role} apps={creatorApps} />;
+  // Find other creators from the same org (by role)
+  const peers = role
+    ? [...new Map(
+        apps
+          .filter((a) => a.role && a.role.toLowerCase() === role.toLowerCase() && a.creator && generateCreatorSlug(a.creator) !== slug)
+          .map((a) => [a.creator.toLowerCase().trim(), { name: a.creator, role: a.role, slug: generateCreatorSlug(a.creator) }])
+      ).values()].slice(0, 6)
+    : [];
+
+  return <CreatorProfilePage creator={creator} role={role} apps={creatorApps} peers={peers} />;
 }
