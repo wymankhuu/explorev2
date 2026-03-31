@@ -16,6 +16,7 @@ import TabToggle, { type TabId } from './TabToggle';
 import ScrollToTop from './ScrollToTop';
 import { useStars } from './useStars';
 import AdminToolbar from './AdminToolbar';
+import { useAdmin } from '@/hooks/useAdmin';
 
 interface HomePageProps {
   apps: App[];
@@ -53,6 +54,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const debouncedQuery = useDebounce(searchQuery, 300);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+  const { isAdmin } = useAdmin();
   const [adminMode, setAdminMode] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -244,6 +246,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                   isStarred={starred.has(app.id)}
                   onToggleStar={() => toggleStar(app.id)}
                   searchQuery={debouncedQuery || undefined}
+                  isAdminMode={isAdmin}
                 />
               ))}
             </div>

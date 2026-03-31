@@ -1,6 +1,6 @@
 'use client';
 
-import { Star, Building2, Heart, GraduationCap, School } from 'lucide-react';
+import { Star, Building2, Heart, GraduationCap, School, Pin, AlertCircle, GripVertical } from 'lucide-react';
 import type { App } from '@/lib/types';
 import { shortDesc, getInitials, highlightSegments } from '@/lib/utils';
 
@@ -12,6 +12,10 @@ interface AppCardProps {
   isStarred?: boolean;
   onToggleStar?: () => void;
   searchQuery?: string;
+  isAdminMode?: boolean;
+  isSelected?: boolean;
+  onSelectToggle?: () => void;
+  showDragHandle?: boolean;
 }
 
 function Highlight({ text, query }: { text: string; query?: string }) {
@@ -50,7 +54,7 @@ function OrgBadge({ name }: { name: string }) {
   );
 }
 
-export default function AppCard({ app, onClick, compact, starCount = 0, isStarred = false, onToggleStar, searchQuery }: AppCardProps) {
+export default function AppCard({ app, onClick, compact, starCount = 0, isStarred = false, onToggleStar, searchQuery, isAdminMode = false, isSelected = false, onSelectToggle, showDragHandle = false }: AppCardProps) {
   const orgName = app.role || app.tags[0] || 'Educator';
   const initials = getInitials(app.creator || 'Unknown');
   const maxTags = 3;
@@ -63,10 +67,45 @@ export default function AppCard({ app, onClick, compact, starCount = 0, isStarre
       onKeyDown={(e) => { if (e.key === 'Enter') onClick(); }}
       role="button"
       tabIndex={0}
-      className={`group block cursor-pointer rounded-lg border-2 border-slate-200 bg-white shadow-md transition-shadow duration-300 hover:shadow-xl ${
+      className={`group relative block cursor-pointer rounded-lg border-2 ${
+        isAdminMode && isSelected ? 'border-amber-400 bg-amber-50/30' : 'border-slate-200 bg-white'
+      } shadow-md transition-shadow duration-300 hover:shadow-xl ${
         compact ? 'w-[280px]' : ''
       }`}
     >
+      {/* Admin indicators */}
+      {isAdminMode && (
+        <>
+          {/* Checkbox for bulk selection */}
+          <div className="absolute top-2 left-2 z-10">
+            <input
+              type="checkbox"
+              checked={isSelected || false}
+              onChange={(e) => { e.stopPropagation(); onSelectToggle?.(); }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-4 h-4 rounded border-amber-300 text-amber-500 focus:ring-amber-300 cursor-pointer"
+            />
+          </div>
+          {/* Pin badge */}
+          {app.pinned && (
+            <div className="absolute top-2 right-2 z-10 w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center" title="Pinned to showcase">
+              <Pin size={10} />
+            </div>
+          )}
+          {/* Warning dot for missing content */}
+          {(!app.usage || !app.impact) && (
+            <div className="absolute top-2 right-8 z-10 w-5 h-5 rounded-full bg-amber-400 text-white flex items-center justify-center" title="Missing usage or impact">
+              <AlertCircle size={10} />
+            </div>
+          )}
+          {/* Drag handle */}
+          {showDragHandle && (
+            <div className="absolute top-1/2 -translate-y-1/2 -left-6 z-10 cursor-grab text-slate-300 hover:text-slate-500">
+              <GripVertical size={16} />
+            </div>
+          )}
+        </>
+      )}
       <div className={`flex flex-col ${compact ? 'min-h-[14rem] p-3.5' : 'min-h-[16rem] p-4'}`}>
         {/* Org badge */}
         <div className="mb-2">
