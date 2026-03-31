@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, LinkIcon, QrCode, Check } from 'lucide-react';
+import { ArrowLeft, LinkIcon, QrCode, Check, Users, Shuffle } from 'lucide-react';
 import DynamicIcon from '@/components/DynamicIcon';
 import type { App, Collection } from '@/lib/types';
 import AppCard from '@/components/AppCard';
@@ -12,7 +12,7 @@ import AdminToolbar from '@/components/AdminToolbar';
 import SortableShowcaseGrid from '@/components/SortableShowcaseGrid';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useStars } from '@/components/useStars';
-import { getCollectionDisplayName, getThemeForCollection } from '@/lib/utils';
+import { getCollectionDisplayName, getThemeForCollection, COMMUNITY_COLLECTION_NAMES, getInitials, stringToColor } from '@/lib/utils';
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
   return <DynamicIcon name={name} size={28} strokeWidth={1.8} className={className} />;
@@ -89,6 +89,12 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
 
   const displayName = getCollectionDisplayName(collection.name);
   const theme = getThemeForCollection(collection.name);
+  const isCommunity = COMMUNITY_COLLECTION_NAMES.includes(collection.name);
+
+  // Community stats
+  const uniqueCreators = [...new Set(collection.apps.map((a) => a.creator).filter(Boolean))];
+  const totalSessions = collection.apps.reduce((sum, a) => sum + (a.sessions || 0), 0);
+  const totalRemixes = collection.apps.reduce((sum, a) => sum + (a.iterations || 0), 0);
 
   return (
     <div className="min-h-screen pb-20">
@@ -127,10 +133,50 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
               {collection.description}
             </p>
           )}
+
+          {/* Community stats */}
+          {isCommunity && (
+            <div className="flex items-center gap-6 mt-5 text-sm text-slate-500">
+              <div className="flex items-center gap-1.5">
+                <Users size={14} />
+                <span>{uniqueCreators.length} {uniqueCreators.length === 1 ? 'builder' : 'builders'}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Shuffle size={14} />
+                <span>{totalRemixes} remixes</span>
+              </div>
+              {totalSessions > 0 && (
+                <span>{totalSessions >= 1000 ? `${(totalSessions / 1000).toFixed(1)}K` : totalSessions} sessions</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pt-8">
+
+        {/* Contributors (community only) */}
+        {isCommunity && uniqueCreators.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-3">Contributors</h2>
+            <div className="flex flex-wrap gap-2">
+              {uniqueCreators.slice(0, 12).map((name) => (
+                <div key={name} className="flex items-center gap-2 rounded-full bg-white border border-slate-200 pl-1 pr-3 py-1">
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0"
+                    style={{ backgroundColor: stringToColor(name) }}
+                  >
+                    {getInitials(name)}
+                  </div>
+                  <span className="text-sm text-slate-700">{name}</span>
+                </div>
+              ))}
+              {uniqueCreators.length > 12 && (
+                <span className="text-sm text-slate-400 self-center ml-1">+{uniqueCreators.length - 12} more</span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* App grid */}
         {isAdmin ? (

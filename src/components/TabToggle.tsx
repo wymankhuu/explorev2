@@ -18,20 +18,20 @@ const tabs: { id: TabId; label: string; icon: typeof Grid2x2 }[] = [
 
 export default function TabToggle({ activeTab, onChange }: TabToggleProps) {
   return (
-    <div className="inline-flex rounded-full border-2 border-slate-200 bg-white p-1 shadow-sm">
+    <div className="inline-flex overflow-x-auto max-w-full rounded-full border-2 border-slate-200 bg-white p-1 shadow-sm scrollbar-hide">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         return (
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 ${
               activeTab === tab.id
                 ? 'bg-playlab-blue text-white shadow-sm'
                 : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Icon size={14} />
+            <Icon size={14} className="shrink-0" />
             {tab.label}
           </button>
         );

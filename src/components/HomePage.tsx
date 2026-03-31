@@ -556,13 +556,17 @@ export default function HomePage({ apps, collections, seedCollections, creators 
               ))}
               {filteredCommunityCollections.length === 0 && (
                 <div className="text-center py-16">
-                  <p className="text-slate-500 text-sm mb-2">No community collections match your search or filters.</p>
-                  <button
-                    onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
-                    className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
-                  >
-                    Clear all filters
-                  </button>
+                  <div className="text-4xl mb-3">🌱</div>
+                  <h3 className="font-heading text-lg font-semibold text-zinc-800 mb-1">Apps are on the way!</h3>
+                  <p className="text-slate-500 text-sm mb-3">Community collections are growing. Check back soon to see what educators are building together.</p>
+                  {(debouncedQuery || Object.values(selectedFilters).some((v) => v.length > 0)) && (
+                    <button
+                      onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
+                      className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                    >
+                      Clear all filters
+                    </button>
+                  )}
                 </div>
               )}
             </div>
