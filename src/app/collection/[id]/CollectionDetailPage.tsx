@@ -87,7 +87,7 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
     <div className="min-h-screen pb-20">
       <AdminToolbar apps={collection.apps} />
       {/* Header */}
-      <div className="max-w-5xl mx-auto px-6 pt-6">
+      <div className="max-w-7xl mx-auto px-6 pt-6">
         <Link
           href="/?tab=collections"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors mb-6"

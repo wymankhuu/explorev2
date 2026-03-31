@@ -277,7 +277,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         {activeTab === 'apps' && (
           <>
             {/* Showcase header */}
@@ -404,12 +404,12 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
 
         {activeTab === 'collections' && (
           <>
-            <div className="mb-4">
+            <div className="mb-6">
               <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5">
                 <span>⭐</span> Spotlight Collections
               </h2>
               <p className="text-sm text-slate-500">
-                {filteredCollections.length} collections shared
+                Browse {filteredCollections.length} curated collections organized by subject, grade level, and use case. Each collection brings together apps from across the community that share a common purpose.
               </p>
             </div>
             <div className="flex flex-col gap-8">
