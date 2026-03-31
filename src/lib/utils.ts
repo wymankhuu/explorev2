@@ -40,6 +40,11 @@ export function generateCollectionId(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+/** Generate a creator slug from name */
+export function generateCreatorSlug(name: string): string {
+  return name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 /** Collection Lucide icon name mapping */
 const COLLECTION_ICONS: Record<string, string> = {
   'Math': 'Calculator',

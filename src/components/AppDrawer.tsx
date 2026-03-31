@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useCallback, useState } from 'react';
+import Link from 'next/link';
 import { X, Star, ExternalLink, Shuffle, FolderPlus, MapPin, BookOpen, TrendingUp, LinkIcon, Check } from 'lucide-react';
 import type { App } from '@/lib/types';
-import { getInitials, formatNumber } from '@/lib/utils';
+import { getInitials, formatNumber, generateCreatorSlug } from '@/lib/utils';
 import AdminPanel from './AdminPanel';
 
 interface AppDrawerProps {
@@ -105,7 +106,15 @@ export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAp
               {initials}
             </div>
             <div className="text-sm leading-snug">
-              <div className="font-medium text-playlab-blue">{app.creator || 'Unknown'}</div>
+              <div className="font-medium text-playlab-blue">
+                {app.creator ? (
+                  <Link href={`/creator/${generateCreatorSlug(app.creator)}`} className="hover:underline">
+                    {app.creator}
+                  </Link>
+                ) : (
+                  'Unknown'
+                )}
+              </div>
               {app.role && <div className="text-slate-500">{app.role}</div>}
               {app.tags.length > 0 && (
                 <div className="text-slate-500 flex items-center gap-1 text-xs">
