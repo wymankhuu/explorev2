@@ -48,8 +48,8 @@ function CreatorCard({ creator }: { creator: Creator }) {
               </div>
             )}
             <div>
-              <h2 className="font-heading text-base sm:text-lg font-bold text-zinc-900">{creator.name}</h2>
-              {roleOrg && <p className="text-sm text-slate-500">{roleOrg}</p>}
+              <h2 className="font-heading text-lg sm:text-xl font-extrabold text-slate-900">{creator.name}</h2>
+              {roleOrg && <p className="text-sm text-slate-600 font-medium">{roleOrg}</p>}
             </div>
           </div>
           <span className="shrink-0 text-[11px] font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-full border border-slate-200">
@@ -69,7 +69,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
         {/* Usage */}
         {creator.usage && (
           <div>
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
               <BookOpen size={12} strokeWidth={2} />
               How They&apos;re Using Playlab
             </h3>
@@ -80,7 +80,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
         {/* Impact */}
         {creator.impact && (
           <div>
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Impact</h3>
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Impact</h3>
             <p className="text-[15px] text-slate-700 leading-relaxed">{creator.impact}</p>
           </div>
         )}
@@ -88,7 +88,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
         {/* Apps */}
         {creator.apps.length > 0 && (
           <div>
-            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Their Apps</h3>
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Their Apps</h3>
             <div className="flex flex-wrap gap-2">
               {creator.apps.map((app) => (
                 <a

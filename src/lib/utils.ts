@@ -107,18 +107,27 @@ export function getCollectionIcon(name: string): string {
 
 /** Container color themes for collections — cycles through these */
 export const CONTAINER_THEMES = [
-  { bg: 'from-green-50 via-emerald-50/70 to-teal-50/80', border: 'border-green-300', iconBg: 'bg-green-100', iconColor: 'text-green-700', accent: 'bg-green-500' },
-  { bg: 'from-blue-50 via-sky-50/70 to-cyan-50/80', border: 'border-blue-300', iconBg: 'bg-blue-100', iconColor: 'text-blue-700', accent: 'bg-blue-500' },
-  { bg: 'from-purple-50 via-violet-50/70 to-fuchsia-50/80', border: 'border-purple-300', iconBg: 'bg-purple-100', iconColor: 'text-purple-700', accent: 'bg-purple-500' },
-  { bg: 'from-amber-50 via-yellow-50/70 to-orange-50/80', border: 'border-amber-300', iconBg: 'bg-amber-100', iconColor: 'text-amber-700', accent: 'bg-amber-500' },
-  { bg: 'from-rose-50 via-pink-50/70 to-red-50/80', border: 'border-rose-300', iconBg: 'bg-rose-100', iconColor: 'text-rose-700', accent: 'bg-rose-500' },
-  { bg: 'from-teal-50 via-cyan-50/70 to-sky-50/80', border: 'border-teal-300', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', accent: 'bg-teal-500' },
-  { bg: 'from-indigo-50 via-blue-50/70 to-violet-50/80', border: 'border-indigo-300', iconBg: 'bg-indigo-100', iconColor: 'text-indigo-700', accent: 'bg-indigo-500' },
-  { bg: 'from-lime-50 via-green-50/70 to-emerald-50/80', border: 'border-lime-300', iconBg: 'bg-lime-100', iconColor: 'text-lime-700', accent: 'bg-lime-500' },
+  { bg: 'from-green-50 via-emerald-50/70 to-teal-50/80', border: 'border-green-300', iconBg: 'bg-green-100', iconColor: 'text-green-700', accent: 'bg-green-500', bannerBg: 'bg-green-50', bannerBorder: 'border-green-200', bannerIcon: 'text-green-600' },
+  { bg: 'from-blue-50 via-sky-50/70 to-cyan-50/80', border: 'border-blue-300', iconBg: 'bg-blue-100', iconColor: 'text-blue-700', accent: 'bg-blue-500', bannerBg: 'bg-blue-50', bannerBorder: 'border-blue-200', bannerIcon: 'text-blue-600' },
+  { bg: 'from-purple-50 via-violet-50/70 to-fuchsia-50/80', border: 'border-purple-300', iconBg: 'bg-purple-100', iconColor: 'text-purple-700', accent: 'bg-purple-500', bannerBg: 'bg-purple-50', bannerBorder: 'border-purple-200', bannerIcon: 'text-purple-600' },
+  { bg: 'from-amber-50 via-yellow-50/70 to-orange-50/80', border: 'border-amber-300', iconBg: 'bg-amber-100', iconColor: 'text-amber-700', accent: 'bg-amber-500', bannerBg: 'bg-amber-50', bannerBorder: 'border-amber-200', bannerIcon: 'text-amber-600' },
+  { bg: 'from-rose-50 via-pink-50/70 to-red-50/80', border: 'border-rose-300', iconBg: 'bg-rose-100', iconColor: 'text-rose-700', accent: 'bg-rose-500', bannerBg: 'bg-rose-50', bannerBorder: 'border-rose-200', bannerIcon: 'text-rose-600' },
+  { bg: 'from-teal-50 via-cyan-50/70 to-sky-50/80', border: 'border-teal-300', iconBg: 'bg-teal-100', iconColor: 'text-teal-700', accent: 'bg-teal-500', bannerBg: 'bg-teal-50', bannerBorder: 'border-teal-200', bannerIcon: 'text-teal-600' },
+  { bg: 'from-indigo-50 via-blue-50/70 to-violet-50/80', border: 'border-indigo-300', iconBg: 'bg-indigo-100', iconColor: 'text-indigo-700', accent: 'bg-indigo-500', bannerBg: 'bg-indigo-50', bannerBorder: 'border-indigo-200', bannerIcon: 'text-indigo-600' },
+  { bg: 'from-lime-50 via-green-50/70 to-emerald-50/80', border: 'border-lime-300', iconBg: 'bg-lime-100', iconColor: 'text-lime-700', accent: 'bg-lime-500', bannerBg: 'bg-lime-50', bannerBorder: 'border-lime-200', bannerIcon: 'text-lime-600' },
 ];
 
 export function getContainerTheme(index: number) {
   return CONTAINER_THEMES[index % CONTAINER_THEMES.length];
+}
+
+/** Get a consistent theme for a collection by name (deterministic hash) */
+export function getThemeForCollection(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return CONTAINER_THEMES[Math.abs(hash) % CONTAINER_THEMES.length];
 }
 
 /** Highlight matching text by splitting into segments */
