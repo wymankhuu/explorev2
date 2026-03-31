@@ -42,7 +42,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   // URL-driven tab state
   const tabParam = searchParams.get('tab') as TabId | null;
   const [activeTab, setActiveTab] = useState<TabId>(
-    tabParam && ['apps', 'starters', 'collections'].includes(tabParam) ? tabParam : 'apps'
+    tabParam && ['apps', 'starters', 'collections', 'communities'].includes(tabParam) ? tabParam : 'apps'
   );
 
   const handleTabChange = useCallback((tab: TabId) => {
@@ -295,7 +295,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       {/* Search */}
       <div className="max-w-md mx-auto px-4 mb-3">
         <SearchBar
-          placeholder={activeTab === 'apps' ? 'Search apps...' : activeTab === 'starters' ? 'Search starters...' : 'Search collections...'}
+          placeholder={activeTab === 'apps' ? 'Search apps...' : activeTab === 'starters' ? 'Search starters...' : activeTab === 'communities' ? 'Search communities...' : 'Search collections...'}
           value={searchQuery}
           onChange={setSearchQuery}
           collections={collectionSuggestions}
@@ -491,33 +491,8 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
               ))}
             </div>
 
-            {/* Community Collections */}
-            {filteredCommunityCollections.length > 0 && (
-              <div className="mt-16">
-                <div className="mb-6">
-                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5">
-                    <span>🌍</span> Community Collections
-                  </h2>
-                  <p className="text-sm text-slate-500">
-                    Explore {filteredCommunityCollections.length} collections built by educator communities and partner organizations, each reflecting their unique context and goals.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-8">
-                  {filteredCommunityCollections.map((collection, i) => (
-                    <CollectionSection
-                      key={collection.id}
-                      collection={collection}
-                      onAppClick={(app) => handleSelectApp(app)}
-                      colorIndex={i + filteredAppCollections.length}
-                      theme={getContainerTheme(i + filteredAppCollections.length)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Empty state */}
-            {filteredAppCollections.length === 0 && filteredCommunityCollections.length === 0 && (
+            {filteredAppCollections.length === 0 && (
               <div className="text-center py-16">
                 <p className="text-slate-500 text-sm mb-2">No collections match your search or filters.</p>
                 <button
@@ -528,6 +503,41 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 </button>
               </div>
             )}
+          </>
+        )}
+
+        {activeTab === 'communities' && (
+          <>
+            <div className="mb-6">
+              <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5">
+                <span>🌍</span> Community Collections
+              </h2>
+              <p className="text-sm text-slate-500">
+                Explore {filteredCommunityCollections.length} collections built by educator communities and partner organizations. Each collection reflects the unique context, standards, and goals of its community.
+              </p>
+            </div>
+            <div className="flex flex-col gap-8">
+              {filteredCommunityCollections.map((collection, i) => (
+                <CollectionSection
+                  key={collection.id}
+                  collection={collection}
+                  onAppClick={(app) => handleSelectApp(app)}
+                  colorIndex={i}
+                  theme={getContainerTheme(i)}
+                />
+              ))}
+              {filteredCommunityCollections.length === 0 && (
+                <div className="text-center py-16">
+                  <p className="text-slate-500 text-sm mb-2">No community collections match your search or filters.</p>
+                  <button
+                    onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
+                    className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

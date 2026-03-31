@@ -1,8 +1,8 @@
 'use client';
 
-import { Grid2x2, Sprout, BarChart3 } from 'lucide-react';
+import { Grid2x2, Sprout, BarChart3, Globe } from 'lucide-react';
 
-export type TabId = 'apps' | 'starters' | 'collections';
+export type TabId = 'apps' | 'starters' | 'collections' | 'communities';
 
 interface TabToggleProps {
   activeTab: TabId;
@@ -13,6 +13,7 @@ const tabs: { id: TabId; label: string; icon: typeof Grid2x2 }[] = [
   { id: 'apps', label: 'Apps', icon: Grid2x2 },
   { id: 'starters', label: 'Starters', icon: Sprout },
   { id: 'collections', label: 'Collections', icon: BarChart3 },
+  { id: 'communities', label: 'Communities', icon: Globe },
 ];
 
 export default function TabToggle({ activeTab, onChange }: TabToggleProps) {
