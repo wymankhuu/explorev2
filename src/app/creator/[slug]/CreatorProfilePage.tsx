@@ -8,6 +8,7 @@ import { getInitials, formatNumber, generateCollectionId, generateCreatorSlug, s
 import AppCard from '@/components/AppCard';
 import AppDrawer from '@/components/AppDrawer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { useStars } from '@/components/useStars';
 
 interface Peer {
   name: string;
@@ -24,18 +25,10 @@ interface CreatorProfilePageProps {
 
 export default function CreatorProfilePage({ creator, role, apps, peers = [] }: CreatorProfilePageProps) {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
-  const [starCounts, setStarCounts] = useState<Record<string, number>>({});
   const [copied, setCopied] = useState(false);
 
-  // Fetch star counts
-  useEffect(() => {
-    const ids = apps.map((a) => a.id).slice(0, 100).join(',');
-    if (!ids) return;
-    fetch(`/api/stars?ids=${ids}`)
-      .then((r) => r.json())
-      .then((data) => setStarCounts(data))
-      .catch(() => {});
-  }, [apps]);
+  const appIds = useMemo(() => apps.map((a) => a.id), [apps]);
+  const { starCounts, starred, toggleStar } = useStars(appIds);
 
   const totalStars = Object.values(starCounts).reduce((sum, n) => sum + n, 0);
   const totalSessions = apps.reduce((sum, a) => sum + (a.sessions || 0), 0);
@@ -175,6 +168,8 @@ export default function CreatorProfilePage({ creator, role, apps, peers = [] }: 
                 app={app}
                 onClick={() => setSelectedApp(app)}
                 starCount={starCounts[app.id] || 0}
+                isStarred={starred.has(app.id)}
+                onToggleStar={() => toggleStar(app.id)}
               />
             ))}
           </div>
@@ -237,6 +232,10 @@ export default function CreatorProfilePage({ creator, role, apps, peers = [] }: 
           onAdminToggle={() => {}}
           onAppUpdated={() => {}}
           starCount={starCounts[selectedApp.id] || 0}
+          isStarred={starred.has(selectedApp.id)}
+          onToggleStar={() => toggleStar(selectedApp.id)}
+          allApps={sortedApps}
+          onNavigate={setSelectedApp}
         />
       )}
 

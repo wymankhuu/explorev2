@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, LinkIcon, QrCode, Check } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -11,6 +11,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import AdminToolbar from '@/components/AdminToolbar';
 import SortableShowcaseGrid from '@/components/SortableShowcaseGrid';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useStars } from '@/components/useStars';
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
   const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
@@ -74,6 +75,9 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const sortedApps = [...collection.apps].sort((a, b) => a.name.localeCompare(b.name));
 
+  const appIds = useMemo(() => collection.apps.map((a) => a.id), [collection.apps]);
+  const { starCounts, starred, toggleStar } = useStars(appIds);
+
   const handleSelectToggle = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -124,9 +128,9 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
           <SortableShowcaseGrid
             apps={sortedApps}
             password={adminPassword}
-            starCounts={{}}
-            starred={new Set<string>()}
-            onToggleStar={() => {}}
+            starCounts={starCounts}
+            starred={starred}
+            onToggleStar={toggleStar}
             onAppClick={setSelectedApp}
             isAdminMode={true}
             selectedIds={selectedIds}
@@ -135,7 +139,14 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {sortedApps.map((app) => (
-              <AppCard key={app.id} app={app} onClick={() => setSelectedApp(app)} />
+              <AppCard
+                key={app.id}
+                app={app}
+                onClick={() => setSelectedApp(app)}
+                starCount={starCounts[app.id] || 0}
+                isStarred={starred.has(app.id)}
+                onToggleStar={() => toggleStar(app.id)}
+              />
             ))}
           </div>
         )}
@@ -155,6 +166,11 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
           adminMode={false}
           onAdminToggle={() => {}}
           onAppUpdated={() => {}}
+          starCount={starCounts[selectedApp.id] || 0}
+          isStarred={starred.has(selectedApp.id)}
+          onToggleStar={() => toggleStar(selectedApp.id)}
+          allApps={sortedApps}
+          onNavigate={setSelectedApp}
         />
       )}
 
