@@ -125,9 +125,33 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const { starCounts, starred, toggleStar } = useStars(appIds);
 
   const showcaseApps = useMemo(() => {
-    return effectiveApps
-      .filter((app) => app.pinned)
-      .sort((a, b) => (a.homepageOrder ?? 999) - (b.homepageOrder ?? 999));
+    // Pick top 2 apps from each collection for high variety
+    const seen = new Set<string>();
+    const collectionPicks: App[] = [];
+    // Group apps by collection tag, take top 2 per collection (by sessions)
+    const byCollection = new Map<string, App[]>();
+    for (const app of effectiveApps) {
+      for (const tag of app.tags) {
+        if (!byCollection.has(tag)) byCollection.set(tag, []);
+        byCollection.get(tag)!.push(app);
+      }
+    }
+    // Sort collections randomly but deterministically by name hash for variety
+    const collectionNames = [...byCollection.keys()].sort();
+    for (const name of collectionNames) {
+      const apps = byCollection.get(name)!
+        .sort((a, b) => (b.sessions || 0) - (a.sessions || 0));
+      let count = 0;
+      for (const app of apps) {
+        if (count >= 2) break;
+        if (!seen.has(app.id)) {
+          seen.add(app.id);
+          collectionPicks.push(app);
+          count++;
+        }
+      }
+    }
+    return collectionPicks;
   }, [effectiveApps]);
 
 
@@ -246,17 +270,20 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       <AdminToolbar apps={effectiveApps} />
       {/* Hero — matches Playlab dev explore page */}
       <div className="explore-hero mb-8 p-8 text-center lg:p-12">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-w-3xl mx-auto">
           <h1 className="hidden w-full lg:block font-heading text-4xl md:text-5xl font-medium text-slate-900 text-balance">
             Explore Community Apps
           </h1>
-          <p className="hidden w-full lg:block text-xl sm:text-2xl font-normal text-zinc-800">
-            Apps made by the Playlab community, ready to try &amp; remix.
+          <p className="hidden w-full lg:block text-lg sm:text-xl font-normal text-zinc-700 leading-relaxed">
+            Playlab empowers educators to build AI-powered tools for their own classrooms, students, and communities. From math tutors to SEL check-ins, from elementary phonics to higher ed research — every app here was built by someone like you, for a context only they understand. Explore some today!
           </p>
           {/* Mobile title — simpler, always visible */}
           <h1 className="lg:hidden font-heading text-2xl font-medium text-slate-900">
             Explore Community Apps
           </h1>
+          <p className="lg:hidden text-sm text-zinc-700">
+            AI-powered tools built by educators, for their own classrooms and communities. Explore some today!
+          </p>
         </div>
       </div>
 
@@ -304,7 +331,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
               </button>
             </div>
             <p className="text-sm text-slate-500 mb-6">
-              {isFiltering ? `${filteredApps.length} apps found` : `${showcaseApps.length} apps showcased`}
+              {isFiltering ? `${filteredApps.length} apps found` : `A diverse selection across ${collections.length} collections — teachers, coaches, students, and leaders building for every subject, grade, and context.`}
             </p>
 
             {isAdmin && !isFiltering ? (
