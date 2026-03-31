@@ -1,5 +1,4 @@
 import { Client } from '@notionhq/client';
-import { cacheLife, cacheTag } from 'next/cache';
 import type { App, Collection, Seed, SeedCollection } from './types';
 import { generateCollectionId, getCollectionIcon } from './utils';
 
@@ -299,21 +298,21 @@ async function fetchSeedCollections(): Promise<SeedCollection[]> {
 // Cached exports
 // ---------------------------------------------------------------------------
 
-async function getCachedData(): Promise<{ apps: App[]; collections: Collection[] }> {
-  'use cache';
-  cacheLife('hours');
-  cacheTag('explore-all-data');
-  return fetchAllData();
-}
-
-async function getCachedSeeds(): Promise<SeedCollection[]> {
-  'use cache';
-  cacheLife('hours');
-  cacheTag('explore-seeds');
-  return fetchSeedCollections();
-}
+// Simple in-memory cache (survives within a single function instance)
+let cachedData: { apps: App[]; collections: Collection[] } | null = null;
+let cachedSeeds: SeedCollection[] | null = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 export async function getAllData(): Promise<{ apps: App[]; collections: Collection[]; seedCollections: SeedCollection[] }> {
-  const [data, seedCollections] = await Promise.all([getCachedData(), getCachedSeeds()]);
+  const now = Date.now();
+  if (cachedData && cachedSeeds && now - cacheTimestamp < CACHE_TTL) {
+    return { ...cachedData, seedCollections: cachedSeeds };
+  }
+
+  const [data, seedCollections] = await Promise.all([fetchAllData(), fetchSeedCollections()]);
+  cachedData = data;
+  cachedSeeds = seedCollections;
+  cacheTimestamp = now;
   return { ...data, seedCollections };
 }
