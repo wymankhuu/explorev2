@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Shield, Database, CheckCircle2, AlertTriangle, Star, Lock, Unlock } from 'lucide-react';
+import { Shield, Database, CheckCircle2, AlertTriangle, Star, Lock, Unlock, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useAdmin } from '@/hooks/useAdmin';
 import type { App, Collection } from '@/lib/types';
@@ -261,6 +261,23 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
 
   const collectionNames = [...new Set(apps.flatMap((a) => a.tags))].sort();
 
+  const exportCsv = () => {
+    const escape = (s: string) => `"${s.replace(/"/g, '""')}"`;
+    const header = 'Name,Creator,Role,Collection,Description,Usage,Impact,Pinned,Stars';
+    const rows = sorted.map((a) =>
+      [a.name, a.creator, a.role, a.tags[0] || '', a.description, a.usage, a.impact, a.pinned ? 'Yes' : 'No', starCounts[a.id] || 0]
+        .map((v) => escape(String(v)))
+        .join(',')
+    );
+    const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `explore-apps-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const SortHeader = ({ label, sortKeyName }: { label: string; sortKeyName: SortKey }) => (
     <th
       className="px-3 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700 select-none"
@@ -327,6 +344,15 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
             ))}
           </select>
           <span className="text-xs text-slate-400">{sorted.length} apps</span>
+          <div className="ml-auto">
+            <button
+              onClick={exportCsv}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors shadow-sm"
+            >
+              <Download size={12} />
+              Export CSV
+            </button>
+          </div>
         </div>
 
         {/* Health Table */}

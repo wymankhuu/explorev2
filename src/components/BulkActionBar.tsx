@@ -8,7 +8,7 @@ interface BulkActionBarProps {
   selectedApps: App[];
   password: string;
   onClear: () => void;
-  onComplete: () => void;
+  onComplete: (pinned: boolean, appIds: string[]) => void;
 }
 
 export default function BulkActionBar({ selectedApps, password, onClear, onComplete }: BulkActionBarProps) {
@@ -31,7 +31,7 @@ export default function BulkActionBar({ selectedApps, password, onClear, onCompl
           }),
         });
       }
-      onComplete();
+      onComplete(pinned, selectedApps.map((a) => a.id));
     } catch {
       alert('Bulk operation failed');
     } finally {

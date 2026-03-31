@@ -62,6 +62,13 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
     setAdminMode(isAdmin);
   }, [isAdmin]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [pinOverrides, setPinOverrides] = useState<Record<string, boolean>>({});
+
+  // Apply optimistic pin overrides to apps
+  const effectiveApps = useMemo(() =>
+    apps.map((a) => a.id in pinOverrides ? { ...a, pinned: pinOverrides[a.id] } : a),
+    [apps, pinOverrides]
+  );
 
   const handleSelectToggle = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -73,13 +80,17 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   }, []);
 
   const selectedApps = useMemo(() =>
-    apps.filter((a) => selectedIds.has(a.id)),
-    [apps, selectedIds]
+    effectiveApps.filter((a) => selectedIds.has(a.id)),
+    [effectiveApps, selectedIds]
   );
 
-  const handleBulkComplete = useCallback(() => {
+  const handleBulkComplete = useCallback((pinned: boolean, appIds: string[]) => {
     setSelectedIds(new Set());
-    window.location.reload();
+    setPinOverrides((prev) => {
+      const next = { ...prev };
+      for (const id of appIds) next[id] = pinned;
+      return next;
+    });
   }, []);
 
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -92,13 +103,13 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const { starCounts, starred, toggleStar } = useStars(appIds);
 
   const showcaseApps = useMemo(() => {
-    return apps
+    return effectiveApps
       .filter((app) => app.pinned)
       .sort((a, b) => (a.homepageOrder ?? 999) - (b.homepageOrder ?? 999));
-  }, [apps]);
+  }, [effectiveApps]);
 
   const filteredApps = useMemo(() => {
-    let result = apps;
+    let result = effectiveApps;
     const q = debouncedQuery.toLowerCase().trim();
 
     if (q) {
@@ -125,7 +136,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
     }
 
     return result;
-  }, [apps, debouncedQuery, selectedFilters]);
+  }, [effectiveApps, debouncedQuery, selectedFilters]);
 
   const filteredCollections = useMemo(() => {
     let result = collections;
@@ -199,7 +210,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
 
   return (
     <div className="min-h-screen pb-20">
-      <AdminToolbar apps={apps} />
+      <AdminToolbar apps={effectiveApps} />
       {/* Hero — matches Playlab dev explore page */}
       <div className="explore-hero mb-8 p-8 text-center lg:p-12">
         <div className="flex flex-col gap-4">
