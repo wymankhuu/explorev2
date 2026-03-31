@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ArrowRight, LinkIcon, QrCode, Check } from 'lucide-react';
 import DynamicIcon from './DynamicIcon';
 import type { App, Collection } from '@/lib/types';
+import { getCollectionDisplayName } from '@/lib/utils';
 import AppCard from './AppCard';
 
 interface CollectionSectionProps {
@@ -87,7 +88,7 @@ export default function CollectionSection({ collection, onAppClick, theme }: Col
           <span className={`inline-flex items-center justify-center w-9 h-9 rounded-xl ${theme.iconBg} shadow-sm`}>
             <CollectionIcon name={collection.iconName} className={theme.iconColor} />
           </span>
-          {collection.name}
+          {getCollectionDisplayName(collection.name)}
           <span className="text-xs font-medium text-slate-400 ml-1">{collection.appCount}</span>
         </h3>
         <div className="flex items-center gap-2 shrink-0">

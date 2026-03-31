@@ -132,6 +132,16 @@ export function highlightSegments(text: string, query: string): { text: string; 
   }));
 }
 
+/** Display name overrides for collections (Notion tags → readable names) */
+export const COLLECTION_DISPLAY_NAMES: Record<string, string> = {
+  'CIOB': 'Consortium of International Outward Bound Schools',
+  'NYC': 'NYCPS',
+};
+
+export function getCollectionDisplayName(name: string): string {
+  return COLLECTION_DISPLAY_NAMES[name] || name;
+}
+
 /** Community collection names — drives the App/Community split on the Collections tab */
 export const COMMUNITY_COLLECTION_NAMES: string[] = [
   'Amplify',
