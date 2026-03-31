@@ -53,7 +53,7 @@ const COLLECTION_DESCRIPTIONS: Record<string, string> = {
   'Amplify': 'Apps built by the Amplify community, reflecting their curriculum philosophy and instructional approach.',
   'CA Community Colleges': 'Tools created by California Community College educators for their unique student populations and institutional contexts.',
   'CIOB': 'Apps developed by the CIOB community to support their specific educational programs and learner needs.',
-  'Fairfax': 'Apps built by Fairfax County educators, tailored to their district\'s students, standards, and instructional priorities.',
+  'Fairfax': 'Apps built by Fairfax County students, showcasing what young people create when given the tools to build for their own classrooms and communities.',
   'Ghana': 'Tools created by Ghanaian educators, reflecting local curricula, languages, and classroom contexts.',
   'KIPP': 'Apps built by KIPP educators, aligned with their mission of preparing students for college and career success.',
   'Leading Educators': 'Tools developed by Leading Educators community members, focused on instructional excellence and teacher leadership.',
