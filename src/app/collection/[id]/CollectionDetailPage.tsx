@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, LinkIcon, QrCode, Check } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 import type { App, Collection } from '@/lib/types';
 import AppCard from '@/components/AppCard';
 import AppDrawer from '@/components/AppDrawer';
@@ -14,8 +14,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useStars } from '@/components/useStars';
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
-  const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
-  return <Icon size={28} strokeWidth={1.8} className={className} />;
+  return <DynamicIcon name={name} size={28} strokeWidth={1.8} className={className} />;
 }
 
 function ShareBar({ collectionId }: { collectionId: string }) {

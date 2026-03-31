@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from './DynamicIcon';
 import type { App } from '@/lib/types';
 import { getInitials } from '@/lib/utils';
 
@@ -24,8 +24,7 @@ interface SearchBarProps {
 }
 
 function CollectionIcon({ name }: { name: string }) {
-  const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
-  return <Icon size={14} strokeWidth={1.8} />;
+  return <DynamicIcon name={name} size={14} strokeWidth={1.8} />;
 }
 
 export default function SearchBar({ placeholder, value, onChange, collections, onCollectionClick, apps, onAppClick }: SearchBarProps) {

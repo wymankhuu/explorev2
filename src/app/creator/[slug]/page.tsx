@@ -1,9 +1,8 @@
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { getAllData } from '@/lib/notion';
 import { generateCreatorSlug } from '@/lib/utils';
 import CreatorProfilePage from './CreatorProfilePage';
-
-export const revalidate = 3600;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -32,5 +31,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       ).values()].slice(0, 6)
     : [];
 
-  return <CreatorProfilePage creator={creator} role={role} apps={creatorApps} peers={peers} />;
+  return (
+    <Suspense>
+      <CreatorProfilePage creator={creator} role={role} apps={creatorApps} peers={peers} />
+    </Suspense>
+  );
 }

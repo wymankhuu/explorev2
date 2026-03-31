@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight, LinkIcon, QrCode, Check } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from './DynamicIcon';
 import type { App, Collection } from '@/lib/types';
 import AppCard from './AppCard';
 
@@ -22,8 +22,7 @@ interface CollectionSectionProps {
 const MAX_PREVIEW = 9;
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
-  const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
-  return <Icon size={20} strokeWidth={1.8} className={className} />;
+  return <DynamicIcon name={name} size={20} strokeWidth={1.8} className={className} />;
 }
 
 function ShareButton({ collectionId }: { collectionId: string }) {
