@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GlobeIcon } from 'lucide-react';
 import type { App, Collection, SeedCollection } from '@/lib/types';
-import { FILTER_OPTIONS, getContainerTheme } from '@/lib/utils';
+import { FILTER_OPTIONS, getContainerTheme, COMMUNITY_COLLECTION_NAMES } from '@/lib/utils';
 import AppCard from './AppCard';
 import AppDrawer from './AppDrawer';
 import CollectionSection from './CollectionSection';
@@ -192,6 +192,16 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
 
     return result;
   }, [collections, debouncedQuery, selectedFilters]);
+
+  const filteredAppCollections = useMemo(() =>
+    filteredCollections.filter((col) => !COMMUNITY_COLLECTION_NAMES.includes(col.name)),
+    [filteredCollections]
+  );
+
+  const filteredCommunityCollections = useMemo(() =>
+    filteredCollections.filter((col) => COMMUNITY_COLLECTION_NAMES.includes(col.name)),
+    [filteredCollections]
+  );
 
   const filteredSeedCollections = useMemo(() => {
     const q = debouncedQuery.toLowerCase().trim();
@@ -409,7 +419,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 <span>⭐</span> Spotlight Collections
               </h2>
               <p className="text-sm text-slate-500">
-                Browse {filteredCollections.length} curated collections organized by subject, grade level, and use case. Each collection brings together apps from across the community that share a common purpose.
+                Browse {filteredAppCollections.length} curated collections organized by subject, grade level, and use case. Each collection brings together apps from across the community that share a common purpose.
               </p>
             </div>
 
@@ -441,8 +451,9 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 </div>
               </div>
             </div>
+            {/* App Collections */}
             <div className="flex flex-col gap-8">
-              {filteredCollections.map((collection, i) => (
+              {filteredAppCollections.map((collection, i) => (
                 <CollectionSection
                   key={collection.id}
                   collection={collection}
@@ -451,18 +462,45 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                   theme={getContainerTheme(i)}
                 />
               ))}
-              {filteredCollections.length === 0 && (
-                <div className="text-center py-16">
-                  <p className="text-slate-500 text-sm mb-2">No collections match your search or filters.</p>
-                  <button
-                    onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
-                    className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              )}
             </div>
+
+            {/* Community Collections */}
+            {filteredCommunityCollections.length > 0 && (
+              <div className="mt-16">
+                <div className="mb-6">
+                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5">
+                    <span>🌍</span> Community Collections
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    Explore {filteredCommunityCollections.length} collections built by educator communities and partner organizations, each reflecting their unique context and goals.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-8">
+                  {filteredCommunityCollections.map((collection, i) => (
+                    <CollectionSection
+                      key={collection.id}
+                      collection={collection}
+                      onAppClick={(app) => handleSelectApp(app)}
+                      colorIndex={i + filteredAppCollections.length}
+                      theme={getContainerTheme(i + filteredAppCollections.length)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {filteredAppCollections.length === 0 && filteredCommunityCollections.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-slate-500 text-sm mb-2">No collections match your search or filters.</p>
+                <button
+                  onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
+                  className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

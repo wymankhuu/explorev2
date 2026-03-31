@@ -87,6 +87,18 @@ const COLLECTION_ICONS: Record<string, string> = {
   'Reading Intervention': 'BookOpenCheck',
   'Flowers': 'Flower2',
   'Niche & Emerging': 'Lightbulb',
+  'Business & Economics': 'TrendingUp',
+  'Cultural Studies': 'BookHeart',
+  'Operations and Management': 'Settings',
+  'Amplify': 'Megaphone',
+  'CA Community Colleges': 'Building2',
+  'CIOB': 'HardHat',
+  'Fairfax': 'MapPin',
+  'Ghana': 'Globe2',
+  'KIPP': 'School2',
+  'Leading Educators': 'Users',
+  'NYC': 'Building',
+  'Texas': 'Star',
 };
 
 export function getCollectionIcon(name: string): string {
@@ -119,6 +131,19 @@ export function highlightSegments(text: string, query: string): { text: string; 
     match: regex.test(part) || part.toLowerCase() === query.toLowerCase(),
   }));
 }
+
+/** Community collection names — drives the App/Community split on the Collections tab */
+export const COMMUNITY_COLLECTION_NAMES: string[] = [
+  'Amplify',
+  'CA Community Colleges',
+  'CIOB',
+  'Fairfax',
+  'Ghana',
+  'KIPP',
+  'Leading Educators',
+  'NYC',
+  'Texas',
+];
 
 /** Filter category definitions */
 export const FILTER_OPTIONS = {

@@ -48,6 +48,18 @@ const COLLECTION_DESCRIPTIONS: Record<string, string> = {
   'World Languages': 'Apps helping students learn languages across many traditions. Conversation practice bots, grammar coaches, cultural context builders, and vocabulary games for Spanish, French, Mandarin, and beyond.',
   'Writing Coaches': 'AI coaches helping students at every stage of the writing process while preserving their voice. Brainstorming tools, outline builders, revision assistants, and genre-specific writing guides.',
   'Family & Community': 'Tools helping families participate in their children\'s education. Newsletter creators, progress update generators, volunteer coordinators, and bilingual communication bridges.',
+  'Business & Economics': 'Apps exploring entrepreneurship, financial literacy, economics principles, and business strategy for students preparing for the modern economy.',
+  'Cultural Studies': 'Tools for exploring diverse cultures, traditions, and global perspectives, helping students develop cultural awareness and appreciation.',
+  'Operations and Management': 'Behind-the-scenes tools for school operations — onboarding, scheduling, policy drafting, event planning, and organizational management.',
+  'Amplify': 'Apps built by the Amplify community, reflecting their curriculum philosophy and instructional approach.',
+  'CA Community Colleges': 'Tools created by California Community College educators for their unique student populations and institutional contexts.',
+  'CIOB': 'Apps developed by the CIOB community to support their specific educational programs and learner needs.',
+  'Fairfax': 'Apps built by Fairfax County educators, tailored to their district\'s students, standards, and instructional priorities.',
+  'Ghana': 'Tools created by Ghanaian educators, reflecting local curricula, languages, and classroom contexts.',
+  'KIPP': 'Apps built by KIPP educators, aligned with their mission of preparing students for college and career success.',
+  'Leading Educators': 'Tools developed by Leading Educators community members, focused on instructional excellence and teacher leadership.',
+  'NYC': 'Apps created by New York City educators, designed for the diverse and dynamic classrooms of NYC schools.',
+  'Texas': 'Tools built by Texas educators, aligned with state standards and the needs of Texas classrooms.',
 };
 
 // Collections to hide
