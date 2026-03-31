@@ -68,6 +68,7 @@ function ShareBar({ collectionId }: { collectionId: string }) {
 
 export default function CollectionDetailPage({ collection }: { collection: Collection }) {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+  const sortedApps = [...collection.apps].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="min-h-screen pb-20">
@@ -107,12 +108,12 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
 
         {/* App grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {collection.apps.map((app) => (
+          {sortedApps.map((app) => (
             <AppCard key={app.id} app={app} onClick={() => setSelectedApp(app)} />
           ))}
         </div>
 
-        {collection.apps.length === 0 && (
+        {sortedApps.length === 0 && (
           <p className="text-center text-slate-500 py-16 text-sm">
             No apps in this collection yet.
           </p>
