@@ -15,6 +15,7 @@ import SubmitAppModal from './SubmitAppModal';
 import TabToggle, { type TabId } from './TabToggle';
 import ScrollToTop from './ScrollToTop';
 import { useStars } from './useStars';
+import AdminToolbar from './AdminToolbar';
 
 interface HomePageProps {
   apps: App[];
@@ -170,6 +171,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
 
   return (
     <div className="min-h-screen pb-20">
+      <AdminToolbar apps={apps} />
       {/* Hero — matches Playlab dev explore page */}
       <div className="explore-hero mb-8 p-8 text-center lg:p-12">
         <div className="flex flex-col gap-4">

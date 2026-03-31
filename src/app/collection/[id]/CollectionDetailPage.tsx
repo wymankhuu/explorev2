@@ -8,6 +8,7 @@ import type { App, Collection } from '@/lib/types';
 import AppCard from '@/components/AppCard';
 import AppDrawer from '@/components/AppDrawer';
 import ScrollToTop from '@/components/ScrollToTop';
+import AdminToolbar from '@/components/AdminToolbar';
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
   const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
@@ -70,6 +71,7 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
 
   return (
     <div className="min-h-screen pb-20">
+      <AdminToolbar apps={collection.apps} />
       {/* Header */}
       <div className="max-w-5xl mx-auto px-6 pt-6">
         <Link
