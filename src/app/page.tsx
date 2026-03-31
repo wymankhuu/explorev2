@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { getAllData } from '@/lib/notion';
 import HomePage from '@/components/HomePage';
-import cultivatorsData from '@/data/cultivators.json';
+import creatorsData from '@/data/creators.json';
 
 export default async function Page() {
   const { apps, collections, seedCollections } = await getAllData();
@@ -12,7 +12,7 @@ export default async function Page() {
         apps={apps}
         collections={collections}
         seedCollections={seedCollections}
-        cultivators={cultivatorsData}
+        creators={creatorsData}
       />
     </Suspense>
   );

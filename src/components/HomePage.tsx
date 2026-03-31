@@ -8,8 +8,8 @@ import { FILTER_OPTIONS, getContainerTheme, COMMUNITY_COLLECTION_NAMES } from '@
 import AppCard from './AppCard';
 import AppDrawer from './AppDrawer';
 import CollectionSection from './CollectionSection';
-import CultivatorSection from './CultivatorSection';
-import type { Cultivator } from './CultivatorSection';
+import CreatorSection from './CreatorSection';
+import type { Creator } from './CreatorSection';
 import FilterBar from './FilterBar';
 import SearchBar from './SearchBar';
 import StarterSection from './StarterSection';
@@ -26,7 +26,7 @@ interface HomePageProps {
   apps: App[];
   collections: Collection[];
   seedCollections: SeedCollection[];
-  cultivators?: Cultivator[];
+  creators?: Creator[];
 }
 
 function useDebounce(value: string, delay: number) {
@@ -38,7 +38,7 @@ function useDebounce(value: string, delay: number) {
   return debounced;
 }
 
-export default function HomePage({ apps, collections, seedCollections, cultivators = [] }: HomePageProps) {
+export default function HomePage({ apps, collections, seedCollections, creators = [] }: HomePageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -326,7 +326,7 @@ export default function HomePage({ apps, collections, seedCollections, cultivato
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800">
-                  {isFiltering ? 'Search Results' : 'Featured Cultivators'}
+                  {isFiltering ? 'Search Results' : 'Featured Creators'}
                 </h2>
                 <p className="text-sm text-slate-500 mt-1">
                   {isFiltering
@@ -375,8 +375,8 @@ export default function HomePage({ apps, collections, seedCollections, cultivato
               </>
             ) : (
               <>
-                {/* Cultivator profiles */}
-                <CultivatorSection cultivators={cultivators} />
+                {/* Creator profiles */}
+                <CreatorSection creators={creators} />
 
                 {/* Showcase apps grid */}
                 <div className="mt-12">
