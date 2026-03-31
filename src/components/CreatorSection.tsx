@@ -22,9 +22,11 @@ export interface Creator {
   apps: CreatorApp[];
 }
 
-function CreatorCard({ creator }: { creator: Creator }) {
+const CREATOR_COLORS = ['#3B82F6', '#8B5CF6', '#EC4899', '#F97316', '#10B981', '#6366F1', '#14B8A6', '#EF4444', '#06B6D4', '#F59E0B'];
+
+function CreatorCard({ creator, colorIndex = 0 }: { creator: Creator; colorIndex?: number }) {
   const initials = getInitials(creator.name);
-  const avatarColor = stringToColor(creator.name);
+  const avatarColor = CREATOR_COLORS[colorIndex % CREATOR_COLORS.length];
   const roleOrg = [creator.role, creator.organization].filter(Boolean).join(' · ');
 
   return (
@@ -147,8 +149,8 @@ export default function CreatorSection({ creators }: { creators: Creator[] }) {
 
       {/* Cards */}
       <div className="flex flex-col gap-8">
-        {creators.map((c) => (
-          <CreatorCard key={c.name} creator={c} />
+        {creators.map((c, i) => (
+          <CreatorCard key={c.name} creator={c} colorIndex={i} />
         ))}
       </div>
     </div>
