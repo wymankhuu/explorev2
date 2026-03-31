@@ -181,13 +181,13 @@ export default function CreatorProfilePage({ creator, role, apps, peers = [] }: 
             <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Collections</h2>
             <div className="flex flex-wrap gap-2">
               {collections.map((c) => (
-                <Link
+                <a
                   key={c.id}
                   href={`/collection/${c.id}`}
                   className="inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
                 >
                   {c.name}
-                </Link>
+                </a>
               ))}
             </div>
           </div>

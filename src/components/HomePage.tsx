@@ -263,8 +263,8 @@ export default function HomePage({ apps, collections, seedCollections, creators 
   );
 
   const handleCollectionClick = useCallback((id: string) => {
-    router.push(`/collection/${id}`);
-  }, [router]);
+    window.location.href = `/collection/${id}`;
+  }, []);
 
   const isFiltering = debouncedQuery || Object.values(selectedFilters).some((v) => v.length > 0);
 

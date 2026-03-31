@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { ArrowRight, LinkIcon, QrCode, Check } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import type { App, Collection } from '@/lib/types';
@@ -94,10 +93,10 @@ export default function CollectionSection({ collection, onAppClick, theme }: Col
         </h3>
         <div className="flex items-center gap-2 shrink-0">
           <ShareButton collectionId={collection.id} />
-          <Link href={`/collection/${collection.id}`} className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors">
+          <a href={`/collection/${collection.id}`} className="flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark transition-colors">
             View all
             <ArrowRight size={14} />
-          </Link>
+          </a>
         </div>
       </div>
 
