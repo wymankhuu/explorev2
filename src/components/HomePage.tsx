@@ -275,7 +275,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
             Explore Community Apps
           </h1>
           <p className="hidden w-full lg:block text-lg sm:text-xl font-normal text-zinc-700 leading-relaxed">
-            Playlab empowers educators to build AI-powered tools for their own classrooms, students, and communities. From math tutors to SEL check-ins, from elementary phonics to higher ed research — every app here was built by someone like you, for a context only they understand. Explore some today!
+            Educators across the country are using Playlab to build AI-powered tools shaped by their own classrooms, students, and communities. Every app here was created by someone who understands their context best. Explore what they&apos;ve built and make it your own.
           </p>
           {/* Mobile title — simpler, always visible */}
           <h1 className="lg:hidden font-heading text-2xl font-medium text-slate-900">
