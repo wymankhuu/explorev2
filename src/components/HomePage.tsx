@@ -18,6 +18,7 @@ import { useStars } from './useStars';
 import AdminToolbar from './AdminToolbar';
 import { useAdmin } from '@/hooks/useAdmin';
 import SortableShowcaseGrid from './SortableShowcaseGrid';
+import BulkActionBar from './BulkActionBar';
 
 interface HomePageProps {
   apps: App[];
@@ -67,6 +68,17 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       return next;
     });
   }, []);
+
+  const selectedApps = useMemo(() =>
+    apps.filter((a) => selectedIds.has(a.id)),
+    [apps, selectedIds]
+  );
+
+  const handleBulkComplete = useCallback(() => {
+    setSelectedIds(new Set());
+    window.location.reload();
+  }, []);
+
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -405,6 +417,16 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       {/* Submit App Modal */}
       {showSubmitModal && (
         <SubmitAppModal onClose={() => setShowSubmitModal(false)} />
+      )}
+
+      {/* Bulk Action Bar */}
+      {isAdmin && selectedIds.size > 0 && (
+        <BulkActionBar
+          selectedApps={selectedApps}
+          password={adminPassword}
+          onClear={() => setSelectedIds(new Set())}
+          onComplete={handleBulkComplete}
+        />
       )}
 
       {/* Scroll to top */}
