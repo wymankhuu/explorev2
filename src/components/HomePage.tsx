@@ -21,6 +21,7 @@ import AdminToolbar from './AdminToolbar';
 import { useAdmin } from '@/hooks/useAdmin';
 import SortableShowcaseGrid from './SortableShowcaseGrid';
 import BulkActionBar from './BulkActionBar';
+import FadeUpGrid from './FadeUpGrid';
 
 interface HomePageProps {
   apps: App[];
@@ -332,6 +333,7 @@ export default function HomePage({ apps, collections, seedCollections, creators 
                 </p>
               </div>
               <button
+                data-submit-app
                 onClick={() => setShowSubmitModal(true)}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-dark transition-colors shrink-0"
               >
@@ -342,22 +344,23 @@ export default function HomePage({ apps, collections, seedCollections, creators 
 
             {isFiltering ? (
               <>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                <FadeUpGrid className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                   {filteredApps.map((app) => (
-                    <AppCard
-                      key={app.id}
-                      app={app}
-                      onClick={() => handleSelectApp(app)}
-                      starCount={starCounts[app.id] || 0}
-                      isStarred={starred.has(app.id)}
-                      onToggleStar={() => toggleStar(app.id)}
-                      searchQuery={debouncedQuery || undefined}
-                      isAdminMode={isAdmin}
-                      isSelected={selectedIds.has(app.id)}
-                      onSelectToggle={() => handleSelectToggle(app.id)}
-                    />
+                    <div key={app.id} className="fade-up">
+                      <AppCard
+                        app={app}
+                        onClick={() => handleSelectApp(app)}
+                        starCount={starCounts[app.id] || 0}
+                        isStarred={starred.has(app.id)}
+                        onToggleStar={() => toggleStar(app.id)}
+                        searchQuery={debouncedQuery || undefined}
+                        isAdminMode={isAdmin}
+                        isSelected={selectedIds.has(app.id)}
+                        onSelectToggle={() => handleSelectToggle(app.id)}
+                      />
+                    </div>
                   ))}
-                </div>
+                </FadeUpGrid>
                 {filteredApps.length === 0 && (
                   <div className="text-center py-16">
                     <p className="text-slate-500 text-sm mb-2">No apps match your search or filters.</p>
@@ -383,21 +386,22 @@ export default function HomePage({ apps, collections, seedCollections, creators 
                   <p className="text-sm text-slate-500 mb-6">
                     A diverse selection across {collections.length} collections — teachers, coaches, students, and leaders building for every subject, grade, and context.
                   </p>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  <FadeUpGrid className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {showcaseApps.map((app) => (
-                      <AppCard
-                        key={app.id}
-                        app={app}
-                        onClick={() => handleSelectApp(app)}
-                        starCount={starCounts[app.id] || 0}
-                        isStarred={starred.has(app.id)}
-                        onToggleStar={() => toggleStar(app.id)}
-                        isAdminMode={isAdmin}
-                        isSelected={selectedIds.has(app.id)}
-                        onSelectToggle={() => handleSelectToggle(app.id)}
-                      />
+                      <div key={app.id} className="fade-up">
+                        <AppCard
+                          app={app}
+                          onClick={() => handleSelectApp(app)}
+                          starCount={starCounts[app.id] || 0}
+                          isStarred={starred.has(app.id)}
+                          onToggleStar={() => toggleStar(app.id)}
+                          isAdminMode={isAdmin}
+                          isSelected={selectedIds.has(app.id)}
+                          onSelectToggle={() => handleSelectToggle(app.id)}
+                        />
+                      </div>
                     ))}
-                  </div>
+                  </FadeUpGrid>
                 </div>
               </>
             )}

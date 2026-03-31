@@ -98,6 +98,17 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Fade-up animation for cards */
+.fade-up {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Collection section backgrounds */
 .collection-bg {
   background: linear-gradient(135deg, #F0F7FF 0%, #FFF8F0 100%);

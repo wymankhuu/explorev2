@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, LinkIcon, QrCode, Check } from 'lucide-react';
+import { ArrowRight, LinkIcon, QrCode, Check, PlusCircle } from 'lucide-react';
 import DynamicIcon from './DynamicIcon';
 import type { App, Collection } from '@/lib/types';
 import { getCollectionDisplayName } from '@/lib/utils';
@@ -114,6 +114,23 @@ export default function CollectionSection({ collection, onAppClick, theme }: Col
             <AppCard app={app} onClick={() => onAppClick(app)} compact />
           </div>
         ))}
+        {collection.appCount < 3 && (
+          <div className="shrink-0 flex items-center">
+            <a
+              href={`https://explorev2.vercel.app/?tab=apps`}
+              onClick={(e) => {
+                e.preventDefault();
+                const btn = document.querySelector('[data-submit-app]') as HTMLButtonElement;
+                if (btn) btn.click();
+              }}
+              className="flex flex-col items-center justify-center w-[280px] min-h-[14rem] rounded-lg border-2 border-dashed border-slate-300 bg-white/50 hover:border-primary hover:bg-blue-50/50 transition-all cursor-pointer text-center px-6"
+            >
+              <PlusCircle size={28} className="text-slate-300 mb-2" />
+              <span className="text-sm font-medium text-slate-500">Know an app that belongs here?</span>
+              <span className="text-xs text-slate-400 mt-1">Suggest it for this collection</span>
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
