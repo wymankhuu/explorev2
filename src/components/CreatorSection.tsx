@@ -29,19 +29,21 @@ function CreatorCard({ creator }: { creator: Creator }) {
 
   return (
     <article className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden">
-      {/* Header with subtle bg */}
-      <div className="bg-slate-50 border-b border-slate-100 px-6 sm:px-8 py-5">
+      {/* Color accent bar */}
+      <div className="h-1.5" style={{ backgroundColor: avatarColor }} />
+      {/* Header */}
+      <div className="px-6 sm:px-8 pt-5 pb-4" style={{ backgroundColor: `${avatarColor}08` }}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             {creator.headshotUrl ? (
               <img
                 src={creator.headshotUrl}
                 alt={creator.name}
-                className="w-14 h-14 rounded-full object-cover shadow-sm shrink-0 ring-2 ring-white"
+                className="w-16 h-16 rounded-full object-cover shrink-0 ring-3 ring-white shadow-md"
               />
             ) : (
               <div
-                className="w-14 h-14 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0 shadow-sm ring-2 ring-white"
+                className="w-16 h-16 rounded-full flex items-center justify-center text-white text-lg font-bold shrink-0 ring-3 ring-white shadow-md"
                 style={{ backgroundColor: avatarColor }}
               >
                 {initials}
@@ -49,10 +51,10 @@ function CreatorCard({ creator }: { creator: Creator }) {
             )}
             <div>
               <h2 className="font-heading text-lg sm:text-xl font-extrabold text-slate-900">{creator.name}</h2>
-              {roleOrg && <p className="text-sm text-slate-600 font-medium">{roleOrg}</p>}
+              {roleOrg && <p className="text-sm font-medium" style={{ color: avatarColor }}>{roleOrg}</p>}
             </div>
           </div>
-          <span className="shrink-0 text-[11px] font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-full border border-slate-200">
+          <span className="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full border" style={{ color: avatarColor, borderColor: `${avatarColor}30`, backgroundColor: `${avatarColor}10` }}>
             {creator.month}
           </span>
         </div>
