@@ -300,6 +300,8 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
           onChange={setSearchQuery}
           collections={collectionSuggestions}
           onCollectionClick={handleCollectionClick}
+          apps={apps}
+          onAppClick={handleSelectApp}
         />
       </div>
 
