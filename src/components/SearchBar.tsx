@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import DynamicIcon from './DynamicIcon';
 import type { App } from '@/lib/types';
 import { getInitials } from '@/lib/utils';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface CollectionSuggestion {
   id: string;
@@ -46,15 +47,7 @@ export default function SearchBar({ placeholder, value, onChange, collections, o
 
   const showDropdown = focused && (matchedCollections.length > 0 || matchedApps.length > 0);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setFocused(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(wrapperRef, useCallback(() => setFocused(false), []));
 
   return (
     <div className="relative" ref={wrapperRef}>

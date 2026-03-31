@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GlobeIcon } from 'lucide-react';
 import type { App, Collection, SeedCollection } from '@/lib/types';
@@ -119,9 +119,6 @@ export default function HomePage({ apps, collections, seedCollections, creators 
   }, []);
 
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   // Stars
   const appIds = useMemo(() => apps.map((a) => a.id), [apps]);

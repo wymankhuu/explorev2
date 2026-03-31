@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ArrowUpDown, X } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { ChevronDown, X } from 'lucide-react';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 interface FilterBarProps {
   filters: Record<string, string[]>;
@@ -31,15 +32,7 @@ function FilterDropdown({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useClickOutside(ref, useCallback(() => setOpen(false), []));
 
   const toggleOption = (option: string) => {
     if (selected.includes(option)) {
@@ -112,11 +105,6 @@ export default function FilterBar({ filters, selected, onChange, onClearAll }: F
           onChange={(values) => onChange(category, values)}
         />
       ))}
-      {/* Newest sort button — matching explore page */}
-      <button className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all">
-        <ArrowUpDown size={13} className="text-slate-500" />
-        Newest
-      </button>
       {hasAnyFilter && onClearAll && (
         <button
           onClick={onClearAll}
