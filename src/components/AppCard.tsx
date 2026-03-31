@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { Star, Building2, Heart, GraduationCap, School, Pin, AlertCircle, GripVertical } from 'lucide-react';
 import type { App } from '@/lib/types';
-import { shortDesc, getInitials, highlightSegments, generateCreatorSlug } from '@/lib/utils';
+import { shortDesc, getInitials, highlightSegments } from '@/lib/utils';
 
 interface AppCardProps {
   app: App;
@@ -121,13 +120,9 @@ export default function AppCard({ app, onClick, compact, starCount = 0, isStarre
             </div>
             <div className="truncate text-sm text-playlab-blue">
               {app.creator ? (
-                <Link
-                  href={`/creator/${generateCreatorSlug(app.creator)}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="hover:underline"
-                >
+                <span>
                   <Highlight text={app.creator} query={searchQuery} />
-                </Link>
+                </span>
               ) : (
                 <span>Unknown</span>
               )}
