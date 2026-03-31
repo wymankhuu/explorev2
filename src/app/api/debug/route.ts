@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
+import { getAllData } from '@/lib/notion';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function GET() {
   const envCheck = {
@@ -27,5 +29,13 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ envCheck, notionTest });
+  let dataTest = 'not tested';
+  try {
+    const data = await getAllData();
+    dataTest = `ok (${data.apps.length} apps, ${data.collections.length} collections, ${data.seedCollections.length} seed collections)`;
+  } catch (e: any) {
+    dataTest = `error: ${e.message}\n${e.stack?.slice(0, 500)}`;
+  }
+
+  return NextResponse.json({ envCheck, notionTest, dataTest });
 }
