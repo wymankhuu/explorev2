@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, LinkIcon, QrCode, Check, Users, Shuffle } from 'lucide-react';
+import { ArrowLeft, LinkIcon, QrCode, Check } from 'lucide-react';
 import DynamicIcon from '@/components/DynamicIcon';
 import type { App, Collection } from '@/lib/types';
 import AppCard from '@/components/AppCard';
@@ -91,10 +91,7 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
   const theme = getThemeForCollection(collection.name);
   const isCommunity = COMMUNITY_COLLECTION_NAMES.includes(collection.name);
 
-  // Community stats
   const uniqueCreators = [...new Set(collection.apps.map((a) => a.creator).filter(Boolean))];
-  const totalSessions = collection.apps.reduce((sum, a) => sum + (a.sessions || 0), 0);
-  const totalRemixes = collection.apps.reduce((sum, a) => sum + (a.iterations || 0), 0);
 
   return (
     <div className="min-h-screen pb-20">
@@ -134,22 +131,6 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
             </p>
           )}
 
-          {/* Community stats */}
-          {isCommunity && (
-            <div className="flex items-center gap-6 mt-5 text-sm text-slate-500">
-              <div className="flex items-center gap-1.5">
-                <Users size={14} />
-                <span>{uniqueCreators.length} {uniqueCreators.length === 1 ? 'builder' : 'builders'}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Shuffle size={14} />
-                <span>{totalRemixes} remixes</span>
-              </div>
-              {totalSessions > 0 && (
-                <span>{totalSessions >= 1000 ? `${(totalSessions / 1000).toFixed(1)}K` : totalSessions} sessions</span>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Shield, Database, CheckCircle2, AlertTriangle, Lock, Unlock, Download, Sparkles } from 'lucide-react';
+import { Shield, Database, CheckCircle2, AlertTriangle, Lock, Unlock, Download, Sparkles, Copy } from 'lucide-react';
 import Link from 'next/link';
 import { useAdmin } from '@/hooks/useAdmin';
 import type { App, Collection } from '@/lib/types';
@@ -254,6 +254,34 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
   const completeApps = apps.filter((a) => a.description && a.usage && a.impact).length;
   const missingApps = totalApps - completeApps;
 
+  // Duplicate detection: similar names or same URL
+  const duplicates = useMemo(() => {
+    const groups: Record<string, App[]> = {};
+    for (const app of apps) {
+      // Normalize: lowercase, remove punctuation, collapse whitespace
+      const key = app.name.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(app);
+    }
+    // Also check for same Playlab URL
+    const urlGroups: Record<string, App[]> = {};
+    for (const app of apps) {
+      if (!app.url) continue;
+      if (!urlGroups[app.url]) urlGroups[app.url] = [];
+      urlGroups[app.url].push(app);
+    }
+    const dupes: { reason: string; apps: App[] }[] = [];
+    for (const [, group] of Object.entries(groups)) {
+      if (group.length > 1) dupes.push({ reason: 'Similar name', apps: group });
+    }
+    for (const [url, group] of Object.entries(urlGroups)) {
+      if (group.length > 1 && !dupes.some((d) => d.apps[0].url === url)) {
+        dupes.push({ reason: 'Same URL', apps: group });
+      }
+    }
+    return dupes;
+  }, [apps]);
+
   // Filter + search
   let filtered = apps;
   if (filterCollection) {
@@ -354,6 +382,28 @@ export default function AdminDashboard({ apps: initialApps, collections }: Admin
           <StatCard icon={CheckCircle2} label="Complete Content" value={completeApps} color="bg-green-500" />
           <StatCard icon={AlertTriangle} label="Missing Content" value={missingApps} color="bg-amber-500" />
         </div>
+
+        {/* Duplicate warnings */}
+        {duplicates.length > 0 && (
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-2 text-sm font-semibold text-orange-800 mb-2">
+              <Copy size={14} />
+              {duplicates.length} potential {duplicates.length === 1 ? 'duplicate' : 'duplicates'} detected
+            </div>
+            <div className="space-y-1.5">
+              {duplicates.slice(0, 5).map((d, i) => (
+                <div key={i} className="text-xs text-orange-700">
+                  <span className="font-medium">{d.reason}:</span>{' '}
+                  {d.apps.map((a) => a.name).join(' / ')}{' '}
+                  <span className="text-orange-500">({d.apps.map((a) => a.creator || 'Unknown').join(', ')})</span>
+                </div>
+              ))}
+              {duplicates.length > 5 && (
+                <div className="text-xs text-orange-500">+{duplicates.length - 5} more</div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex items-center gap-3 mb-4">
