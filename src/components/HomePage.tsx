@@ -56,6 +56,28 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const debouncedQuery = useDebounce(searchQuery, 300);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+
+  // Deep link: ?app=<id> opens the drawer on load
+  useEffect(() => {
+    const appId = searchParams.get('app');
+    if (appId && !selectedApp) {
+      const found = apps.find((a) => a.id === appId);
+      if (found) setSelectedApp(found);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync ?app= param when drawer opens/closes
+  const handleSelectApp = useCallback((app: App | null) => {
+    setSelectedApp(app);
+    const url = new URL(window.location.href);
+    if (app) {
+      url.searchParams.set('app', app.id);
+    } else {
+      url.searchParams.delete('app');
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  }, [router]);
+
   const { isAdmin, password: adminPassword } = useAdmin();
   const [adminMode, setAdminMode] = useState(false);
   useEffect(() => {
@@ -194,7 +216,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
 
   const handleAppUpdated = (updatedFields: Partial<App>) => {
     if (selectedApp) {
-      setSelectedApp({ ...selectedApp, ...updatedFields });
+      handleSelectApp({ ...selectedApp, ...updatedFields });
     }
   };
 
@@ -250,6 +272,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
           filters={FILTER_OPTIONS}
           selected={selectedFilters}
           onChange={handleFilterChange}
+          onClearAll={() => { setSearchQuery(''); setSelectedFilters({}); }}
         />
       </div>
 
@@ -281,7 +304,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 starCounts={starCounts}
                 starred={starred}
                 onToggleStar={toggleStar}
-                onAppClick={setSelectedApp}
+                onAppClick={handleSelectApp}
                 searchQuery={debouncedQuery || undefined}
                 isAdminMode={true}
                 selectedIds={selectedIds}
@@ -293,7 +316,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                   <AppCard
                     key={app.id}
                     app={app}
-                    onClick={() => setSelectedApp(app)}
+                    onClick={() => handleSelectApp(app)}
                     starCount={starCounts[app.id] || 0}
                     isStarred={starred.has(app.id)}
                     onToggleStar={() => toggleStar(app.id)}
@@ -394,7 +417,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 <CollectionSection
                   key={collection.id}
                   collection={collection}
-                  onAppClick={(app) => setSelectedApp(app)}
+                  onAppClick={(app) => handleSelectApp(app)}
                   colorIndex={i}
                   theme={getContainerTheme(i)}
                 />
@@ -419,7 +442,7 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       {selectedApp && (
         <AppDrawer
           app={selectedApp}
-          onClose={() => setSelectedApp(null)}
+          onClose={() => handleSelectApp(null)}
           adminMode={adminMode}
           onAdminToggle={() => setAdminMode(!adminMode)}
           onAppUpdated={handleAppUpdated}

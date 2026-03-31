@@ -29,22 +29,50 @@ function CollectionIcon({ name, className }: { name: string; className?: string 
 
 function ShareButton({ collectionId }: { collectionId: string }) {
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+
+  const url = typeof window !== 'undefined'
+    ? `${window.location.origin}/collection/${collectionId}`
+    : `/collection/${collectionId}`;
+
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
 
   const copyLink = async () => {
-    const url = `${window.location.origin}/collection/${collectionId}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <button
-      onClick={copyLink}
-      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 px-2 py-1 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-700 transition-colors"
-    >
-      {copied ? <Check size={12} className="text-green-600" /> : <LinkIcon size={12} />}
-      {copied ? 'Copied!' : 'Share'}
-    </button>
+    <>
+      <button
+        onClick={copyLink}
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 px-2 py-1 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-700 transition-colors"
+      >
+        {copied ? <Check size={12} className="text-green-600" /> : <LinkIcon size={12} />}
+        {copied ? 'Copied!' : 'Share'}
+      </button>
+      <button
+        onClick={() => setShowQr(true)}
+        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white/80 px-2 py-1 text-xs font-medium text-slate-500 hover:bg-white hover:text-slate-700 transition-colors"
+      >
+        <QrCode size={12} />
+      </button>
+      {showQr && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowQr(false)}>
+          <div className="bg-white rounded-2xl p-6 shadow-xl text-center" onClick={(e) => e.stopPropagation()}>
+            <img src={qrSrc} alt="QR code for this collection" width={200} height={200} className="mx-auto rounded-lg" />
+            <p className="text-xs text-slate-500 mt-3 max-w-[200px] break-all">{url}</p>
+            <button
+              onClick={() => setShowQr(false)}
+              className="mt-4 text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

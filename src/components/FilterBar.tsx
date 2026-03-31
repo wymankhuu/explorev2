@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ArrowUpDown } from 'lucide-react';
+import { ChevronDown, ArrowUpDown, X } from 'lucide-react';
 
 interface FilterBarProps {
   filters: Record<string, string[]>;
   selected: Record<string, string[]>;
   onChange: (category: string, values: string[]) => void;
+  onClearAll?: () => void;
 }
 
 const FILTER_LABELS: Record<string, string> = {
@@ -97,7 +98,9 @@ function FilterDropdown({
   );
 }
 
-export default function FilterBar({ filters, selected, onChange }: FilterBarProps) {
+export default function FilterBar({ filters, selected, onChange, onClearAll }: FilterBarProps) {
+  const hasAnyFilter = Object.values(selected).some((v) => v.length > 0);
+
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
       {Object.entries(filters).map(([category, options]) => (
@@ -114,6 +117,15 @@ export default function FilterBar({ filters, selected, onChange }: FilterBarProp
         <ArrowUpDown size={13} className="text-slate-500" />
         Newest
       </button>
+      {hasAnyFilter && onClearAll && (
+        <button
+          onClick={onClearAll}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-[13px] font-medium text-red-600 hover:bg-red-100 transition-all"
+        >
+          <X size={12} />
+          Clear all
+        </button>
+      )}
     </div>
   );
 }
