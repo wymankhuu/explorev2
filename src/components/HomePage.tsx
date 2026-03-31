@@ -412,6 +412,35 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
                 Browse {filteredCollections.length} curated collections organized by subject, grade level, and use case. Each collection brings together apps from across the community that share a common purpose.
               </p>
             </div>
+
+            {/* How to use collections */}
+            <div className="mb-10 px-6 py-8">
+              <div className="flex items-center justify-between relative">
+                {/* Connecting line */}
+                <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-amber-300 via-orange-300 to-rose-300" />
+
+                {/* Step 1 */}
+                <div className="relative flex flex-col items-center text-center z-10 w-1/3">
+                  <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold ring-4 ring-white shadow-sm">1</div>
+                  <h4 className="font-heading font-semibold text-zinc-800 mt-3 text-sm sm:text-base">Browse a collection</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-[200px]">Find a topic that fits your classroom, subject, or role</p>
+                </div>
+
+                {/* Step 2 */}
+                <div className="relative flex flex-col items-center text-center z-10 w-1/3">
+                  <div className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-bold ring-4 ring-white shadow-sm">2</div>
+                  <h4 className="font-heading font-semibold text-zinc-800 mt-3 text-sm sm:text-base">Try an app</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-[220px]">Open any app to see how other educators built it, then try it yourself</p>
+                </div>
+
+                {/* Step 3 */}
+                <div className="relative flex flex-col items-center text-center z-10 w-1/3">
+                  <div className="w-10 h-10 rounded-full bg-rose-500 text-white flex items-center justify-center text-sm font-bold ring-4 ring-white shadow-sm">3</div>
+                  <h4 className="font-heading font-semibold text-zinc-800 mt-3 text-sm sm:text-base">Remix &amp; share</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-[220px]">Remix any app to make it your own, or share the collection with your team</p>
+                </div>
+              </div>
+            </div>
             <div className="flex flex-col gap-8">
               {filteredCollections.map((collection, i) => (
                 <CollectionSection
