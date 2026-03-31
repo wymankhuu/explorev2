@@ -1,0 +1,119 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDown, ArrowUpDown } from 'lucide-react';
+
+interface FilterBarProps {
+  filters: Record<string, string[]>;
+  selected: Record<string, string[]>;
+  onChange: (category: string, values: string[]) => void;
+}
+
+const FILTER_LABELS: Record<string, string> = {
+  gradeLevel: 'Grade Level',
+  context: 'Context',
+  useCases: 'Use Cases',
+  features: 'Features',
+};
+
+function FilterDropdown({
+  label,
+  options,
+  selected,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  selected: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleOption = (option: string) => {
+    if (selected.includes(option)) {
+      onChange(selected.filter((s) => s !== option));
+    } else {
+      onChange([...selected, option]);
+    }
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-1 px-3.5 py-1.5 rounded-lg border text-[13px] font-medium transition-all ${
+          selected.length > 0
+            ? 'bg-blue-50 border-blue-200 text-blue-600'
+            : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+        }`}
+      >
+        {label}
+        {selected.length > 0 && (
+          <span className="bg-blue-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center leading-none ml-0.5">
+            {selected.length}
+          </span>
+        )}
+        <ChevronDown size={13} className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="filter-dropdown absolute top-full left-0 mt-1.5 w-52 bg-white rounded-xl border border-slate-200 shadow-lg z-50 p-1.5 max-h-60 overflow-y-auto">
+          {options.map((option) => (
+            <label
+              key={option}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer text-[13px]"
+            >
+              <input
+                type="checkbox"
+                checked={selected.includes(option)}
+                onChange={() => toggleOption(option)}
+                className="w-3.5 h-3.5 rounded border-slate-300 text-blue-500 focus:ring-blue-500/20"
+              />
+              <span className="text-slate-700">{option}</span>
+            </label>
+          ))}
+          {selected.length > 0 && (
+            <button
+              onClick={() => onChange([])}
+              className="w-full mt-0.5 px-2.5 py-1 text-[11px] text-slate-500 hover:text-slate-600 text-left"
+            >
+              Clear filter
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function FilterBar({ filters, selected, onChange }: FilterBarProps) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      {Object.entries(filters).map(([category, options]) => (
+        <FilterDropdown
+          key={category}
+          label={FILTER_LABELS[category] || category}
+          options={options}
+          selected={selected[category] || []}
+          onChange={(values) => onChange(category, values)}
+        />
+      ))}
+      {/* Newest sort button — matching explore page */}
+      <button className="flex items-center gap-1 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-medium text-slate-600 hover:border-slate-300 hover:bg-slate-50 transition-all">
+        <ArrowUpDown size={13} className="text-slate-500" />
+        Newest
+      </button>
+    </div>
+  );
+}
