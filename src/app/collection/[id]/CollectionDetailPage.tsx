@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, LinkIcon, QrCode, Check } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -9,6 +9,8 @@ import AppCard from '@/components/AppCard';
 import AppDrawer from '@/components/AppDrawer';
 import ScrollToTop from '@/components/ScrollToTop';
 import AdminToolbar from '@/components/AdminToolbar';
+import SortableShowcaseGrid from '@/components/SortableShowcaseGrid';
+import { useAdmin } from '@/hooks/useAdmin';
 
 function CollectionIcon({ name, className }: { name: string; className?: string }) {
   const Icon = (LucideIcons as any)[name] || LucideIcons.FolderOpen;
@@ -68,7 +70,18 @@ function ShareBar({ collectionId }: { collectionId: string }) {
 
 export default function CollectionDetailPage({ collection }: { collection: Collection }) {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
+  const { isAdmin, password: adminPassword } = useAdmin();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const sortedApps = [...collection.apps].sort((a, b) => a.name.localeCompare(b.name));
+
+  const handleSelectToggle = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   return (
     <div className="min-h-screen pb-20">
@@ -107,11 +120,25 @@ export default function CollectionDetailPage({ collection }: { collection: Colle
         )}
 
         {/* App grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {sortedApps.map((app) => (
-            <AppCard key={app.id} app={app} onClick={() => setSelectedApp(app)} />
-          ))}
-        </div>
+        {isAdmin ? (
+          <SortableShowcaseGrid
+            apps={sortedApps}
+            password={adminPassword}
+            starCounts={{}}
+            starred={new Set<string>()}
+            onToggleStar={() => {}}
+            onAppClick={setSelectedApp}
+            isAdminMode={true}
+            selectedIds={selectedIds}
+            onSelectToggle={handleSelectToggle}
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {sortedApps.map((app) => (
+              <AppCard key={app.id} app={app} onClick={() => setSelectedApp(app)} />
+            ))}
+          </div>
+        )}
 
         {sortedApps.length === 0 && (
           <p className="text-center text-slate-500 py-16 text-sm">
