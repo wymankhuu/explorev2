@@ -3,9 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Lock, Unlock, PenLine, Save, Pin, PinOff } from 'lucide-react';
 import type { App } from '@/lib/types';
-
-const ADMIN_MODE_KEY = 'explorev2-admin-mode';
-const ADMIN_PWD_KEY = 'explorev2-admin-pwd';
+import { useAdmin } from '@/hooks/useAdmin';
 
 interface AdminPanelProps {
   app: App;
@@ -87,7 +85,7 @@ function PasswordModal({
 }
 
 export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAdmin, password: adminPassword, login } = useAdmin();
   const [showPwdModal, setShowPwdModal] = useState(false);
   const [creator, setCreator] = useState(app.creator || '');
   const [role, setRole] = useState(app.role || '');
@@ -99,12 +97,8 @@ export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
   const [pinning, setPinning] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem(ADMIN_MODE_KEY) === 'true') {
-      setIsAuthed(true);
-    } else {
-      setShowPwdModal(true);
-    }
-  }, []);
+    if (!isAdmin) setShowPwdModal(true);
+  }, [isAdmin]);
 
   useEffect(() => {
     setCreator(app.creator || '');
@@ -115,12 +109,8 @@ export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
     setSaveLabel('Save to Database');
   }, [app.id, app.creator, app.role, app.description, app.usage, app.impact]);
 
-  const getPassword = () => sessionStorage.getItem(ADMIN_PWD_KEY) || '';
-
   const handleAuth = (pwd: string) => {
-    sessionStorage.setItem(ADMIN_MODE_KEY, 'true');
-    sessionStorage.setItem(ADMIN_PWD_KEY, pwd);
-    setIsAuthed(true);
+    login(pwd);
     setShowPwdModal(false);
   };
 
@@ -132,7 +122,7 @@ export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          password: getPassword(),
+          password: adminPassword,
           appName: app.name,
           creator: creator.trim(),
           role: role.trim(),
@@ -172,7 +162,7 @@ export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          password: getPassword(),
+          password: adminPassword,
           appName: app.name,
           pinned: newPinned,
           collectionName: app.tags[0] || '',
@@ -196,7 +186,7 @@ export default function AdminPanel({ app, onAppUpdated }: AdminPanelProps) {
     return <PasswordModal onSuccess={handleAuth} onCancel={() => setShowPwdModal(false)} />;
   }
 
-  if (!isAuthed) return null;
+  if (!isAdmin) return null;
 
   return (
     <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 space-y-3">
