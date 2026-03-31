@@ -8,6 +8,8 @@ import { FILTER_OPTIONS, getContainerTheme, COMMUNITY_COLLECTION_NAMES } from '@
 import AppCard from './AppCard';
 import AppDrawer from './AppDrawer';
 import CollectionSection from './CollectionSection';
+import CultivatorSection from './CultivatorSection';
+import type { Cultivator } from './CultivatorSection';
 import FilterBar from './FilterBar';
 import SearchBar from './SearchBar';
 import StarterSection from './StarterSection';
@@ -24,6 +26,7 @@ interface HomePageProps {
   apps: App[];
   collections: Collection[];
   seedCollections: SeedCollection[];
+  cultivators?: Cultivator[];
 }
 
 function useDebounce(value: string, delay: number) {
@@ -35,7 +38,7 @@ function useDebounce(value: string, delay: number) {
   return debounced;
 }
 
-export default function HomePage({ apps, collections, seedCollections }: HomePageProps) {
+export default function HomePage({ apps, collections, seedCollections, cultivators = [] }: HomePageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -319,64 +322,87 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
       <div className="max-w-7xl mx-auto px-6">
         {activeTab === 'apps' && (
           <>
-            {/* Showcase header */}
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5">
-                <span>🌟</span> Showcase Apps
-              </h2>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800">
+                  {isFiltering ? 'Search Results' : 'Featured Cultivators'}
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  {isFiltering
+                    ? `${filteredApps.length} apps found`
+                    : 'Meet the educators building tools that reflect the communities they serve.'}
+                </p>
+              </div>
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-dark transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-dark transition-colors shrink-0"
               >
                 <GlobeIcon className="w-4 h-4" />
-                Submit your App for Review
+                Submit your App
               </button>
             </div>
-            <p className="text-sm text-slate-500 mb-6">
-              {isFiltering ? `${filteredApps.length} apps found` : `A diverse selection across ${collections.length} collections — teachers, coaches, students, and leaders building for every subject, grade, and context.`}
-            </p>
 
-            {isAdmin && !isFiltering ? (
-              <SortableShowcaseGrid
-                apps={showcaseApps}
-                password={adminPassword}
-                starCounts={starCounts}
-                starred={starred}
-                onToggleStar={toggleStar}
-                onAppClick={handleSelectApp}
-                searchQuery={debouncedQuery || undefined}
-                isAdminMode={true}
-                selectedIds={selectedIds}
-                onSelectToggle={handleSelectToggle}
-              />
+            {isFiltering ? (
+              <>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {filteredApps.map((app) => (
+                    <AppCard
+                      key={app.id}
+                      app={app}
+                      onClick={() => handleSelectApp(app)}
+                      starCount={starCounts[app.id] || 0}
+                      isStarred={starred.has(app.id)}
+                      onToggleStar={() => toggleStar(app.id)}
+                      searchQuery={debouncedQuery || undefined}
+                      isAdminMode={isAdmin}
+                      isSelected={selectedIds.has(app.id)}
+                      onSelectToggle={() => handleSelectToggle(app.id)}
+                    />
+                  ))}
+                </div>
+                {filteredApps.length === 0 && (
+                  <div className="text-center py-16">
+                    <p className="text-slate-500 text-sm mb-2">No apps match your search or filters.</p>
+                    <button
+                      onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
+                      className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                    >
+                      Clear all filters
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {(isFiltering ? filteredApps : showcaseApps).map((app) => (
-                  <AppCard
-                    key={app.id}
-                    app={app}
-                    onClick={() => handleSelectApp(app)}
-                    starCount={starCounts[app.id] || 0}
-                    isStarred={starred.has(app.id)}
-                    onToggleStar={() => toggleStar(app.id)}
-                    searchQuery={debouncedQuery || undefined}
-                    isAdminMode={isAdmin}
-                    isSelected={selectedIds.has(app.id)}
-                    onSelectToggle={() => handleSelectToggle(app.id)}
-                  />
-                ))}
-              </div>
-            )}
-            {isFiltering && filteredApps.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-slate-500 text-sm mb-2">No apps match your search or filters.</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setSelectedFilters({}); }}
-                  className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
-                >
-                  Clear all filters
-                </button>
-              </div>
+              <>
+                {/* Cultivator profiles */}
+                <CultivatorSection cultivators={cultivators} />
+
+                {/* Showcase apps grid */}
+                <div className="mt-12">
+                  <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-zinc-800 flex items-center gap-1.5 mb-1">
+                    <span>🌟</span> Showcase Apps
+                  </h2>
+                  <p className="text-sm text-slate-500 mb-6">
+                    A diverse selection across {collections.length} collections — teachers, coaches, students, and leaders building for every subject, grade, and context.
+                  </p>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {showcaseApps.map((app) => (
+                      <AppCard
+                        key={app.id}
+                        app={app}
+                        onClick={() => handleSelectApp(app)}
+                        starCount={starCounts[app.id] || 0}
+                        isStarred={starred.has(app.id)}
+                        onToggleStar={() => toggleStar(app.id)}
+                        isAdminMode={isAdmin}
+                        isSelected={selectedIds.has(app.id)}
+                        onSelectToggle={() => handleSelectToggle(app.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </>
         )}
