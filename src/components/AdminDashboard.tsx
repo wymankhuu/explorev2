@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Shield, Database, CheckCircle2, AlertTriangle, Star, Lock, Unlock, Download } from 'lucide-react';
+import { Shield, Database, CheckCircle2, AlertTriangle, Star, Lock, Unlock, Download, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useAdmin } from '@/hooks/useAdmin';
 import type { App, Collection } from '@/lib/types';
@@ -109,6 +109,29 @@ function InlineEditor({ app, password, onSaved }: { app: App; password: string; 
   const [usage, setUsage] = useState(app.usage || '');
   const [impact, setImpact] = useState(app.impact || '');
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState<string | null>(null);
+
+  const handleGenerate = async (field: 'usage' | 'impact') => {
+    setGenerating(field);
+    try {
+      const res = await fetch('/api/admin-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, appName: app.name, description: description || app.description, field }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert('Generate failed: ' + (data.error || 'Unknown'));
+        return;
+      }
+      if (field === 'usage') setUsage(data.text);
+      if (field === 'impact') setImpact(data.text);
+    } catch {
+      alert('Generate failed');
+    } finally {
+      setGenerating(null);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -162,11 +185,35 @@ function InlineEditor({ app, password, onSaved }: { app: App; password: string; 
         <textarea className="w-full px-2.5 py-1.5 text-sm border border-amber-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-300" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
       <div>
-        <label className="block text-xs font-medium text-amber-700 mb-0.5">How It&apos;s Being Used</label>
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-xs font-medium text-amber-700">How It&apos;s Being Used</label>
+          {!usage && (
+            <button
+              onClick={() => handleGenerate('usage')}
+              disabled={generating !== null}
+              className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-600 hover:text-purple-800 disabled:opacity-50"
+            >
+              <Sparkles size={10} />
+              {generating === 'usage' ? 'Generating...' : 'Auto-generate'}
+            </button>
+          )}
+        </div>
         <textarea className="w-full px-2.5 py-1.5 text-sm border border-amber-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-300" rows={2} value={usage} onChange={(e) => setUsage(e.target.value)} />
       </div>
       <div>
-        <label className="block text-xs font-medium text-amber-700 mb-0.5">Impact</label>
+        <div className="flex items-center justify-between mb-0.5">
+          <label className="text-xs font-medium text-amber-700">Impact</label>
+          {!impact && (
+            <button
+              onClick={() => handleGenerate('impact')}
+              disabled={generating !== null}
+              className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-600 hover:text-purple-800 disabled:opacity-50"
+            >
+              <Sparkles size={10} />
+              {generating === 'impact' ? 'Generating...' : 'Auto-generate'}
+            </button>
+          )}
+        </div>
         <textarea className="w-full px-2.5 py-1.5 text-sm border border-amber-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-300" rows={2} value={impact} onChange={(e) => setImpact(e.target.value)} />
       </div>
       <button

@@ -449,6 +449,8 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
           starCount={starCounts[selectedApp.id] || 0}
           isStarred={starred.has(selectedApp.id)}
           onToggleStar={() => toggleStar(selectedApp.id)}
+          allApps={isFiltering ? filteredApps : showcaseApps}
+          onNavigate={handleSelectApp}
         />
       )}
 

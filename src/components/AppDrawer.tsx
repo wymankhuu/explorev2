@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useCallback, useState } from 'react';
-import { X, Star, ExternalLink, Shuffle, FolderPlus, MapPin, BookOpen, TrendingUp, LinkIcon, Check } from 'lucide-react';
+import { X, Star, ExternalLink, Shuffle, FolderPlus, MapPin, BookOpen, TrendingUp, LinkIcon, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { App } from '@/lib/types';
-import { getInitials, formatNumber } from '@/lib/utils';
+import { getInitials, formatNumber, shortDesc } from '@/lib/utils';
 import AdminPanel from './AdminPanel';
 
 interface AppDrawerProps {
@@ -15,6 +15,8 @@ interface AppDrawerProps {
   starCount?: number;
   isStarred?: boolean;
   onToggleStar?: () => void;
+  allApps?: App[];
+  onNavigate?: (app: App) => void;
 }
 
 function CopyLinkButton({ url }: { url: string }) {
@@ -37,14 +39,21 @@ function CopyLinkButton({ url }: { url: string }) {
   );
 }
 
-export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAppUpdated, starCount = 0, isStarred = false, onToggleStar }: AppDrawerProps) {
+export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAppUpdated, starCount = 0, isStarred = false, onToggleStar, allApps, onNavigate }: AppDrawerProps) {
   const initials = getInitials(app.creator || 'Unknown');
+
+  // Keyboard navigation: Escape to close, Arrow keys to browse
+  const currentIndex = allApps?.findIndex((a) => a.id === app.id) ?? -1;
+  const prevApp = allApps && currentIndex > 0 ? allApps[currentIndex - 1] : null;
+  const nextApp = allApps && currentIndex >= 0 && currentIndex < allApps.length - 1 ? allApps[currentIndex + 1] : null;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft' && prevApp && onNavigate) onNavigate(prevApp);
+      if (e.key === 'ArrowRight' && nextApp && onNavigate) onNavigate(nextApp);
     },
-    [onClose]
+    [onClose, prevApp, nextApp, onNavigate]
   );
 
   useEffect(() => {
@@ -55,6 +64,13 @@ export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAp
       document.body.style.overflow = '';
     };
   }, [handleKeyDown]);
+
+  // Related apps: same tags, different app
+  const relatedApps = allApps
+    ? allApps
+        .filter((a) => a.id !== app.id && a.tags.some((t) => app.tags.includes(t)))
+        .slice(0, 3)
+    : [];
 
   return (
     <div
@@ -70,13 +86,40 @@ export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAp
       <div className="drawer-panel relative w-full max-w-[440px] bg-white h-full overflow-y-auto shadow-2xl border-l border-slate-200">
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-5 py-3 border-b border-slate-200">
-          <span className="text-sm font-semibold text-playlab-blue">App Details</span>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-md hover:bg-slate-100 transition-colors"
-          >
-            <X size={18} className="text-slate-500" />
-          </button>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-semibold text-playlab-blue">App Details</span>
+            {allApps && allApps.length > 1 && (
+              <span className="text-xs text-slate-400 ml-1">
+                {currentIndex + 1}/{allApps.length}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            {onNavigate && prevApp && (
+              <button
+                onClick={() => onNavigate(prevApp)}
+                className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+                title="Previous app (←)"
+              >
+                <ChevronLeft size={18} className="text-slate-400" />
+              </button>
+            )}
+            {onNavigate && nextApp && (
+              <button
+                onClick={() => onNavigate(nextApp)}
+                className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+                title="Next app (→)"
+              >
+                <ChevronRight size={18} className="text-slate-400" />
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-1 rounded-md hover:bg-slate-100 transition-colors"
+            >
+              <X size={18} className="text-slate-500" />
+            </button>
+          </div>
         </div>
 
         <div className="px-5 py-4 space-y-5">
@@ -212,6 +255,30 @@ export default function AppDrawer({ app, onClose, adminMode, onAdminToggle, onAp
             )}
             {app.url && <CopyLinkButton url={app.url} />}
           </div>
+
+          {/* Related Apps */}
+          {relatedApps.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">Related Apps</h3>
+              <div className="space-y-2">
+                {relatedApps.map((related) => (
+                  <button
+                    key={related.id}
+                    onClick={() => onNavigate?.(related)}
+                    className="w-full text-left flex items-start gap-3 p-2.5 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary text-white text-[9px] font-bold shrink-0 mt-0.5">
+                      {getInitials(related.creator || 'U')}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-playlab-blue truncate">{related.name}</div>
+                      <div className="text-xs text-slate-500 line-clamp-1">{shortDesc(related.description)}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Admin toggle */}
           <div className="pt-3 pb-1">
