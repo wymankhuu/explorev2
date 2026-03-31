@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink, BookOpen } from 'lucide-react';
+import { ExternalLink, BookOpen, TrendingUp } from 'lucide-react';
 import { getInitials, stringToColor } from '@/lib/utils';
 
 interface CreatorApp {
@@ -82,7 +82,10 @@ function CreatorCard({ creator }: { creator: Creator }) {
         {/* Impact */}
         {creator.impact && (
           <div>
-            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2">Impact</h3>
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+              <TrendingUp size={12} strokeWidth={2} />
+              Impact
+            </h3>
             <p className="text-[15px] text-slate-700 leading-relaxed">{creator.impact}</p>
           </div>
         )}
