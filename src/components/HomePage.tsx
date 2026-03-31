@@ -17,6 +17,7 @@ import ScrollToTop from './ScrollToTop';
 import { useStars } from './useStars';
 import AdminToolbar from './AdminToolbar';
 import { useAdmin } from '@/hooks/useAdmin';
+import SortableShowcaseGrid from './SortableShowcaseGrid';
 
 interface HomePageProps {
   apps: App[];
@@ -54,8 +55,18 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
   const debouncedQuery = useDebounce(searchQuery, 300);
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
-  const { isAdmin } = useAdmin();
+  const { isAdmin, password: adminPassword } = useAdmin();
   const [adminMode, setAdminMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const handleSelectToggle = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -236,20 +247,37 @@ export default function HomePage({ apps, collections, seedCollections }: HomePag
               {isFiltering ? `${filteredApps.length} apps found` : `${showcaseApps.length} apps showcased`}
             </p>
 
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {(isFiltering ? filteredApps : showcaseApps).map((app) => (
-                <AppCard
-                  key={app.id}
-                  app={app}
-                  onClick={() => setSelectedApp(app)}
-                  starCount={starCounts[app.id] || 0}
-                  isStarred={starred.has(app.id)}
-                  onToggleStar={() => toggleStar(app.id)}
-                  searchQuery={debouncedQuery || undefined}
-                  isAdminMode={isAdmin}
-                />
-              ))}
-            </div>
+            {isAdmin && !isFiltering ? (
+              <SortableShowcaseGrid
+                apps={showcaseApps}
+                password={adminPassword}
+                starCounts={starCounts}
+                starred={starred}
+                onToggleStar={toggleStar}
+                onAppClick={setSelectedApp}
+                searchQuery={debouncedQuery || undefined}
+                isAdminMode={true}
+                selectedIds={selectedIds}
+                onSelectToggle={handleSelectToggle}
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {(isFiltering ? filteredApps : showcaseApps).map((app) => (
+                  <AppCard
+                    key={app.id}
+                    app={app}
+                    onClick={() => setSelectedApp(app)}
+                    starCount={starCounts[app.id] || 0}
+                    isStarred={starred.has(app.id)}
+                    onToggleStar={() => toggleStar(app.id)}
+                    searchQuery={debouncedQuery || undefined}
+                    isAdminMode={isAdmin}
+                    isSelected={selectedIds.has(app.id)}
+                    onSelectToggle={() => handleSelectToggle(app.id)}
+                  />
+                ))}
+              </div>
+            )}
             {isFiltering && filteredApps.length === 0 && (
               <div className="text-center py-16">
                 <p className="text-slate-500 text-sm mb-2">No apps match your search or filters.</p>
